@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>{{ data?.mode === 'session' ? 'Registrar Sesión' : 'Nuevo Material' }}</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Tipo</mat-label>
+    <mat-select [(ngModel)]="type" name="type">
+      <mat-option value="pdf">PDF</mat-option>
+      <mat-option value="doc">Documento</mat-option>
+      <mat-option value="link" *ngIf="data?.mode !== 'session'">Enlace</mat-option>
+      <mat-option value="video" *ngIf="data?.mode !== 'session'">Video</mat-option>
+      <mat-option value="foto" *ngIf="data?.mode !== 'session'">Imagen</mat-option>
+      <mat-option value="texto" *ngIf="data?.mode !== 'session'">Texto</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Título</mat-label>
+    <input matInput [(ngModel)]="title" name="title" placeholder="Título del material" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <input matInput [(ngModel)]="description" name="description" placeholder="Breve descripción (opcional)" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width" *ngIf="type === 'link' || type === 'video'">
+    <mat-label>URL</mat-label>
+    <input matInput [(ngModel)]="url" name="url" placeholder="https://..." />
+  </mat-form-field>
+
+  <div class="file-upload" *ngIf="type !== 'link' && type !== 'video'">
+    <input #fileInput type="file" id="matFile2" class="file-input"
+           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4,.txt"
+           (change)="onFileSelected($event)" />
+    <label for="matFile2" class="btn btn-outline">
+      <mat-icon>attach_file</mat-icon>
+      {{ file ? file.name : 'Adjuntar archivo' }}
+    </label>
+    <button *ngIf="file" mat-icon-button color="warn" type="button" (click)="file = null; fileInput.value = ''" aria-label="Quitar archivo">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!title" (click)="save()">Guardar</button>
+</mat-dialog-actions>

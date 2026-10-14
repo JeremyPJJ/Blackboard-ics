@@ -1,0 +1,172 @@
+<div class="room-container">
+  <div class="room-header">
+    <div class="room-header-left">
+      <a class="room-back" [routerLink]="['/courses', courseId]" aria-label="Volver al curso">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <div>
+        <h1>{{ loadingCourse ? 'Sala de reuniones' : courseName || 'Sala de reuniones' }}</h1>
+        <span class="room-subtitle">Sala fija del curso — video, audio y chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error de acceso: no-miembro (Spec O2 esc.4) o fallo de check-in -->
+  <div *ngIf="meetingError() || store.error()" class="room-error room-error-block">
+    <mat-icon>lock</mat-icon>
+    <p>{{ meetingError() || store.error() }}</p>
+    <a mat-button [routerLink]="['/courses', courseId]">Volver al curso</a>
+  </div>
+
+  <ng-container *ngIf="!meetingError() && !store.error()">
+    <div class="room-layout">
+      <div class="room-media">
+        <div class="room-grid">
+          <!-- Tile local (Spec N5: arrastre libre dentro del contenedor) -->
+          <div
+            class="room-tile"
+            cdkDrag
+            cdkDragBoundary=".room-container"
+            [class.tile-muted]="!camEnabled()"
+          >
+            <video #localVideo autoplay muted playsinline></video>
+            <div *ngIf="!camEnabled()" class="tile-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="tile-overlay">
+              <span class="tile-name">Tú</span>
+              <span class="tile-status">
+                <mat-icon *ngIf="!micEnabled()" matTooltip="Micrófono silenciado">mic_off</mat-icon>
+                <mat-icon *ngIf="!camEnabled()" matTooltip="Cámara apagada">videocam_off</mat-icon>
+              </span>
+            </div>
+          </div>
+
+          <!-- Tiles remotos (mesh) — Spec N5: arrastre libre con boundary -->
+          <div
+            *ngFor="let peer of remotePeers()"
+            class="room-tile"
+            cdkDrag
+            cdkDragBoundary=".room-container"
+            [class.tile-muted]="!peerHasVideo(peer)"
+          >
+            <video *ngIf="peer.stream" [srcObject]="peer.stream" autoplay playsinline></video>
+            <div *ngIf="!peerHasVideo(peer)" class="tile-avatar">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="tile-overlay">
+              <span class="tile-name">{{ displayNameOf(peer.userId) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aviso de cámara/micrófono denegados (Spec O2 esc.2) -->
+        <div *ngIf="audioOnly() || mediaDenied()" class="room-notice">
+          <mat-icon>info</mat-icon>
+          <span *ngIf="audioOnly()">Cámara no disponible: te unes solo con audio y chat.</span>
+          <span *ngIf="mediaDenied()">Cámara y micrófono no disponibles: la sala funciona solo con chat.</span>
+        </div>
+
+        <!-- Controles -->
+        <div class="room-controls">
+          <button
+            mat-fab
+            extended
+            type="button"
+            class="control-btn"
+            [disabled]="!micEnabled()"
+            (click)="toggleMic()"
+            [matTooltip]="micEnabled() ? 'Silenciar micrófono' : 'Micrófono no disponible'"
+          >
+            <mat-icon>{{ micEnabled() ? 'mic' : 'mic_off' }}</mat-icon>
+          </button>
+          <button
+            mat-fab
+            extended
+            type="button"
+            class="control-btn"
+            [disabled]="!camEnabled()"
+            (click)="toggleCam()"
+            [matTooltip]="camEnabled() ? 'Apagar cámara' : 'Cámara no disponible'"
+          >
+            <mat-icon>{{ camEnabled() ? 'videocam' : 'videocam_off' }}</mat-icon>
+          </button>
+          <button
+            mat-fab
+            extended
+            type="button"
+            class="control-btn"
+            (click)="toggleChat()"
+            [matTooltip]="chatOpen() ? 'Ocultar chat' : 'Mostrar chat'"
+          >
+            <mat-icon>chat</mat-icon>
+          </button>
+          <button
+            mat-fab
+            extended
+            type="button"
+            class="control-btn leave-btn"
+            (click)="leaveRoom()"
+            matTooltip="Salir de la sala"
+          >
+            <mat-icon>call_end</mat-icon>
+            <span>Salir</span>
+          </button>
+        </div>
+
+        <p class="room-note">
+          <mat-icon>groups</mat-icon>
+          {{ store.participants().length + 1 }} en la sala · Enlace:
+          <code class="room-link-inline">{{ roomUrl }}</code>
+          <button mat-icon-button type="button" (click)="copyLink()" aria-label="Copiar enlace de la sala">
+            <mat-icon>link</mat-icon>
+          </button>
+          · Conexión directa entre participantes (misma red).
+        </p>
+      </div>
+
+      <!-- Panel chat lateral -->
+      <aside class="room-chat" [class.chat-hidden]="!chatOpen()">
+        <div class="chat-header">
+          <h2>Chat de la sala</h2>
+          <button mat-icon-button type="button" (click)="toggleChat()" aria-label="Cerrar chat">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="chat-messages" #chatScroll>
+          <p *ngIf="chatMessages().length === 0" class="chat-empty">Sin mensajes todavía.</p>
+          <div
+            *ngFor="let msg of chatMessages()"
+            class="chat-msg"
+            [class.chat-msg-own]="msg.own"
+          >
+            <span class="chat-msg-author">{{ msg.own ? 'Tú' : displayNameOf(msg.userId) }}</span>
+            <span class="chat-msg-text">{{ msg.content }}</span>
+            <span class="chat-msg-time">{{ formatChatTime(msg.sentAt) }}</span>
+          </div>
+        </div>
+        <div class="chat-form">
+          <mat-form-field appearance="outline" class="chat-input">
+            <input
+              matInput
+              [value]="chatDraft()"
+              (input)="onChatDraft($event)"
+              (keyup.enter)="sendChat()"
+              placeholder="Escribe un mensaje…"
+              autocomplete="off"
+            />
+          </mat-form-field>
+          <button
+            mat-icon-button
+            type="button"
+            (click)="sendChat()"
+            [disabled]="!chatDraft().trim()"
+            aria-label="Enviar mensaje"
+          >
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+      </aside>
+    </div>
+  </ng-container>
+</div>

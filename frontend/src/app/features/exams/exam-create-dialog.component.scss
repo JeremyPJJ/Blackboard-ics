@@ -1,0 +1,100 @@
+.dialog-content {
+  min-width: 560px;
+  max-width: 94vw;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.config-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.questions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0 0.75rem;
+
+  h3 {
+    color: var(--color-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+.question-card {
+  border: 1px solid #e3e8ef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: #fafbfc;
+}
+
+.q-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.q-number {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.q-text-field {
+  flex: 1;
+}
+
+.q-points {
+  width: 80px;
+}
+
+.options-editor {
+  margin: 0.5rem 0;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+
+  mat-checkbox {
+    flex: none;
+    width: 110px;
+  }
+}
+
+.opt-field {
+  flex: 1;
+}
+
+.dev-hint {
+  color: var(--color-text-light);
+  font-size: 0.8125rem;
+  font-style: italic;
+}
+
+.add-question-btn {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .dialog-content { min-width: 88vw; }
+  .config-row { grid-template-columns: 1fr; }
+}

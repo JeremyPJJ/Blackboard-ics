@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Detalle del Docente</h2>
+<mat-dialog-content>
+  <div class="teacher-header">
+    <strong>{{ data.teacher.name }}</strong>
+    <span>{{ data.teacher.email }}</span>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-item"><span class="num">{{ data.teacher.courseCount }}</span><span>Cursos</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.sessionCount }}</span><span>Sesiones</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.taskCount }}</span><span>Tareas</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.materialCount }}</span><span>Recursos</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.forumCount || 0 }}</span><span>Foros</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.examCount || 0 }}</span><span>Exámenes</span></div>
+    <div class="summary-item"><span class="num">{{ data.teacher.attendanceCount }}</span><span>Reg. Asistencia</span></div>
+  </div>
+
+  <h3 class="courses-title">Cursos ({{ data.courses.length }})</h3>
+  <div class="course-stats-list" *ngIf="data.courses.length > 0">
+    <div class="course-stats-row" *ngFor="let c of data.courses">
+      <div class="course-stats-name">{{ c.name }}</div>
+      <div class="course-stats-cells">
+        <span class="cell" title="Sesiones"><mat-icon>event</mat-icon> {{ c.sessionCount }}</span>
+        <span class="cell" title="Tareas"><mat-icon>assignment</mat-icon> {{ c.taskCount }}</span>
+        <span class="cell" title="Recursos"><mat-icon>folder_open</mat-icon> {{ c.materialCount }}</span>
+        <span class="cell" title="Foros"><mat-icon>forum</mat-icon> {{ c.forumCount || 0 }}</span>
+        <span class="cell" title="Exámenes"><mat-icon>quiz</mat-icon> {{ c.examCount || 0 }}</span>
+        <span class="cell" title="Asistencia"><mat-icon>fact_check</mat-icon> {{ c.attendanceCount }}</span>
+      </div>
+    </div>
+  </div>
+  <p *ngIf="data.courses.length === 0">Sin cursos.</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" (click)="openProfile()">
+    <mat-icon>person</mat-icon> Ver perfil
+  </button>
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

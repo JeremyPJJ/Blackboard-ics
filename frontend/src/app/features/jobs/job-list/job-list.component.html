@@ -1,0 +1,112 @@
+<div class="jobs-page">
+  <div class="jobs-header">
+    <div>
+      <h1>Ofertas laborales</h1>
+      <p class="subtitle">
+        {{ canManage
+          ? 'Gestiona las ofertas y revisa las postulaciones de los estudiantes.'
+          : 'Encuentra oportunidades de práctica y empleo para tu carrera.' }}
+      </p>
+    </div>
+    <div class="header-actions">
+      <button
+        *ngIf="canManage"
+        mat-raised-button
+        color="primary"
+        (click)="goToAdmin()"
+      >
+        <mat-icon>add_circle</mat-icon>
+        Gestionar ofertas
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="store.loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div *ngIf="store.error()" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ store.error() }}</span>
+    <button mat-button color="primary" (click)="loadJobs()">Reintentar</button>
+  </div>
+
+  <ng-container *ngIf="!store.loading() && !store.error()">
+    <div *ngIf="visibleJobs().length === 0" class="empty-state">
+      <mat-icon>work_off</mat-icon>
+      <h2>No hay ofertas disponibles</h2>
+      <p *ngIf="canManage">
+        Crea la primera oferta laboral para que los estudiantes puedan postular.
+      </p>
+      <p *ngIf="!canManage">
+        Vuelve más tarde; cuando una institución publique ofertas aparecerán aquí.
+      </p>
+      <button
+        *ngIf="canManage"
+        mat-raised-button
+        color="primary"
+        (click)="goToAdmin()"
+      >
+        <mat-icon>add</mat-icon>
+        Crear oferta
+      </button>
+    </div>
+
+    <div class="jobs-grid" *ngIf="visibleJobs().length > 0">
+      <mat-card
+        *ngFor="let job of visibleJobs()"
+        class="job-card"
+        [class.job-card--inactive]="!isActive(job)"
+      >
+        <mat-card-header>
+          <mat-card-title>{{ job.position }}</mat-card-title>
+          <mat-card-subtitle>{{ job.company }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="job-tags">
+            <span *ngIf="job.career" class="tag tag--career">{{ job.career }}</span>
+            <span *ngIf="job.modality" class="tag tag--modality">
+              {{ job.modality | titlecase }}
+            </span>
+            <span
+              class="tag"
+              [class.tag--status-active]="isActive(job)"
+              [class.tag--status-inactive]="!isActive(job)"
+            >
+              {{ statusLabels[job.status] }}
+            </span>
+          </div>
+
+          <div class="job-meta">
+            <span *ngIf="job.location" class="meta-item">
+              <mat-icon>place</mat-icon> {{ job.location }}
+            </span>
+            <span *ngIf="job.salary" class="meta-item">
+              <mat-icon>payments</mat-icon> {{ job.salary }}
+            </span>
+            <span class="meta-item">
+              <mat-icon>event</mat-icon>
+              Cierre: {{ job.deadline | date: 'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          <p class="job-description" *ngIf="job.description">
+            {{ job.description | slice: 0 : 160 }}{{ job.description.length > 160 ? '…' : '' }}
+          </p>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-stroked-button (click)="goToDetail(job)">Ver detalle</button>
+          <button
+            *ngIf="canApply && isActive(job) && isDeadlineOpen(job)"
+            mat-raised-button
+            color="primary"
+            (click)="goToApply(job)"
+          >
+            <mat-icon>send</mat-icon>
+            Postular
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,157 @@
+.login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(165deg, #f5f7fa 0%, #dce6f5 55%, #cfdcf0 100%);
+}
+
+.login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 20px;
+}
+
+/* Layout de dos paneles: marca + formulario, sin espacios vacíos */
+.login-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  width: 100%;
+  max-width: 880px;
+  background: var(--color-white);
+  border: 1px solid #e3e8ef;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 24px 48px -12px rgba(0, 51, 102, 0.2);
+}
+
+/* ---- Panel institucional ---- */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.25rem;
+  padding: 3rem 2rem;
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-white);
+
+  h1 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 1rem 0 0;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0;
+    opacity: 0.9;
+  }
+
+  .system-name {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin: 1rem 0 0;
+    color: var(--color-secondary);
+  }
+}
+
+.institutional-logo {
+  height: 96px;
+  width: auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* ---- Panel del formulario ---- */
+.login-form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 2.75rem;
+}
+
+.form-title {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.form-subtitle {
+  color: var(--color-text-light);
+  font-size: 0.875rem;
+  margin: 0 0 1.75rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.login-form button[type='submit'] {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 0.75rem;
+}
+
+.inline-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.login-footer {
+  text-align: center;
+  margin: 1.25rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.login-footer-section {
+  background: var(--color-primary);
+  color: var(--color-white);
+  text-align: center;
+  padding: 0.875rem 1rem;
+  font-size: 0.8125rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+/* ---- Mobile: marca arriba, formulario abajo ---- */
+@media (max-width: 768px) {
+  .login-main {
+    padding: 1.5rem 16px;
+  }
+
+  .login-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .login-brand {
+    padding: 2rem 1.5rem;
+
+    h1 {
+      font-size: 1.1875rem;
+    }
+  }
+
+  .institutional-logo {
+    height: 72px;
+  }
+
+  .login-form-panel {
+    padding: 2rem 1.5rem;
+  }
+}

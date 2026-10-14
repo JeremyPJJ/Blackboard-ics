@@ -1,0 +1,93 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Examen' : 'Nuevo Examen' }}</h2>
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Título</mat-label>
+    <input matInput [(ngModel)]="title" name="title" placeholder="Ej: Examen parcial - Semana 1" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <textarea matInput [(ngModel)]="description" name="description" rows="2"></textarea>
+  </mat-form-field>
+
+  <div class="config-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Duración (min)</mat-label>
+      <input matInput type="number" [(ngModel)]="duration" name="duration" min="1" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Intentos máximos</mat-label>
+      <input matInput type="number" [(ngModel)]="maxAttempts" name="maxAttempts" min="1" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Nota aprobatoria</mat-label>
+      <input matInput type="number" [(ngModel)]="passingScore" name="passingScore" min="0" max="20" />
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Mensaje de supervisión (se muestra al estudiante)</mat-label>
+    <textarea matInput [(ngModel)]="supervisionMessage" name="supervisionMessage" rows="2"></textarea>
+  </mat-form-field>
+
+  <div class="questions-header">
+    <h3>Preguntas ({{ questions.length }})</h3>
+    <button mat-stroked-button color="primary" (click)="addQuestion()">
+      <mat-icon>add</mat-icon> Agregar pregunta
+    </button>
+  </div>
+
+  <div class="question-card" *ngFor="let q of questions; let qi = index">
+    <div class="q-card-header">
+      <span class="q-number">{{ qi + 1 }}</span>
+      <mat-form-field appearance="outline" class="q-text-field">
+        <input matInput [(ngModel)]="q.text" name="qtext{{qi}}" placeholder="Escribe la pregunta..." />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="q-points">
+        <mat-label>Pts</mat-label>
+        <input matInput type="number" [(ngModel)]="q.points" name="qpoints{{qi}}" min="0.5" step="0.5" />
+      </mat-form-field>
+      <button mat-icon-button color="warn" (click)="removeQuestion(qi)" aria-label="Eliminar pregunta">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tipo</mat-label>
+      <mat-select [(ngModel)]="q.type" name="qtype{{qi}}" (selectionChange)="onTypeChange(q)">
+        <mat-option value="opcion_multiple">Opción múltiple</mat-option>
+        <mat-option value="verdadero_falso">Verdadero / Falso</mat-option>
+        <mat-option value="completar">Completar</mat-option>
+        <mat-option value="desarrollo">Desarrollo</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="options-editor" *ngIf="q.type === 'opcion_multiple' || q.type === 'verdadero_falso'">
+      <div class="option-row" *ngFor="let opt of q.options; let oi = index">
+        <mat-checkbox [(ngModel)]="opt.isCorrect" [name]="'correct' + qi + '_' + oi" color="primary"
+                      [disabled]="q.type === 'verdadero_falso'" matTooltip="¿Es la respuesta correcta?">
+          Correcta
+        </mat-checkbox>
+        <mat-form-field appearance="outline" class="opt-field">
+          <input matInput [(ngModel)]="opt.text" [name]="'opt' + qi + '_' + oi" [placeholder]="q.type === 'verdadero_falso' ? (oi === 0 ? 'Verdadero' : 'Falso') : 'Opción ' + (oi + 1)" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width" *ngIf="q.type === 'completar'">
+      <mat-label>Respuesta correcta (texto exacto)</mat-label>
+      <input matInput [(ngModel)]="q.correctAnswer" name="answer{{qi}}" placeholder="Palabra o frase exacta" />
+    </mat-form-field>
+
+    <p class="dev-hint" *ngIf="q.type === 'desarrollo'">Pregunta de desarrollo: el docente calificará manualmente.</p>
+  </div>
+
+  <button mat-stroked-button color="primary" class="add-question-btn" (click)="addQuestion()">
+    <mat-icon>add</mat-icon> Agregar pregunta
+  </button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!title || questions.length === 0 || !validQuestions()" (click)="save()">
+    {{ isEdit ? 'Guardar cambios' : 'Crear examen' }}
+  </button>
+</mat-dialog-actions>

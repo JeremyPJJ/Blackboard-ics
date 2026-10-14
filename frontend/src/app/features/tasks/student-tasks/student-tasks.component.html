@@ -1,0 +1,62 @@
+﻿
+    <section class="student-tasks" aria-labelledby="tasks-title">
+      <header class="page-header">
+        <div class="page-header-left">
+          <app-back-button></app-back-button>
+          <div>
+            <h1 id="tasks-title">Mis Tareas</h1>
+            <p class="page-subtitle">Tareas de tus cursos inscritos</p>
+          </div>
+        </div>
+      </header>
+
+      <app-loading-message *ngIf="isLoading" message="Cargando tus tareas..."></app-loading-message>
+
+      <app-empty-state *ngIf="!isLoading && items.length === 0" message="No tienes tareas pendientes o entregadas">
+      </app-empty-state>
+
+      <ul class="task-list" *ngIf="!isLoading && items.length > 0" aria-label="Lista de tareas">
+        <li class="task-card" *ngFor="let item of items">
+          <div class="task-card-top">
+            <div>
+              <h3>{{ item.task.title }}</h3>
+              <p class="task-course">{{ item.course.name }}</p>
+            </div>
+            <span class="badge"
+                  [class.badge-warning]="item.status === 'pendiente'"
+                  [class.badge-info]="item.status === 'entregado'"
+                  [class.badge-success]="item.status === 'calificado'">
+              {{ item.status }}
+            </span>
+          </div>
+
+          <div class="task-session-grid">
+            <div class="session-cell">
+              <span class="session-label">Semana</span>
+              <span class="session-value">{{ item.task.weekNumber }}</span>
+            </div>
+            <div class="session-cell">
+              <span class="session-label">Sesión</span>
+              <span class="session-value">{{ item.task.sessionNumber }}</span>
+            </div>
+          </div>
+
+          <p class="task-deadline" *ngIf="item.task.deadline">
+            Fecha límite: {{ item.task.deadline | date:'fullDate' }}
+          </p>
+          <p class="task-deadline" *ngIf="item.task.noDeadline">Sin fecha límite</p>
+
+          <div class="task-score-block" *ngIf="item.submission?.score !== undefined && item.submission?.score !== null">
+            <span class="score-label">Nota</span>
+            <span class="score-value">{{ item.submission.score }}<span *ngIf="item.task.maxScore"> / {{ item.task.maxScore }}</span></span>
+          </div>
+
+          <div class="task-actions">
+            <button class="btn btn-primary" [routerLink]="['/my-tasks', item.task._id]">
+              {{ item.status === 'pendiente' ? 'Entregar' : 'Ver Tarea' }}
+            </button>
+          </div>
+        </li>
+      </ul>
+    </section>
+  

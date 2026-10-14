@@ -1,0 +1,51 @@
+<mat-card class="import-card">
+  <mat-card-header>
+    <mat-card-title>Importación completada</mat-card-title>
+    <mat-card-subtitle *ngIf="store.courseName()">{{ store.courseName() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p class="import-ok">
+      La importación se registró correctamente. Los participantes fueron creados o
+      actualizados e inscritos en el curso.
+    </p>
+
+    <div class="import-summary-chips" *ngIf="store.confirmResult()">
+      <span class="import-chip import-chip-valid">Exitosas: {{ successCount }}</span>
+      <span class="import-chip import-chip-duplicate">Duplicadas: {{ duplicateCount }}</span>
+      <span class="import-chip import-chip-error">Erróneas: {{ errorCount }}</span>
+      <span class="import-chip import-chip-total">
+        ImportLog: {{ store.confirmResult()!.importLogId }}
+      </span>
+    </div>
+
+    <h3 class="import-section-title">Resultado por fila</h3>
+    <table class="import-table" *ngIf="store.confirmResult()">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Estado</th>
+          <th>Mensaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of store.confirmResult()!.results">
+          <td>{{ row.rowNumber }}</td>
+          <td>
+            <span class="import-status" [ngClass]="statusClass(row.status)">
+              {{ row.status }}
+            </span>
+          </td>
+          <td>{{ row.message }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="import-actions">
+      <button mat-raised-button color="primary" type="button" (click)="newImport()">
+        <mat-icon>replay</mat-icon>
+        Nueva importación
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

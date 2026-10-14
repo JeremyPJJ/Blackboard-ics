@@ -1,0 +1,104 @@
+﻿
+    <section class="task-detail" aria-labelledby="task-title">
+      <app-loading-message *ngIf="isLoading" message="Cargando detalle de la tarea..."></app-loading-message>
+      
+      <div *ngIf="!isLoading && task" class="task-content">
+        <div class="back-row">
+          <app-back-button></app-back-button>
+        </div>
+        <header>
+          <h1 id="task-title">{{ task.title }}</h1>
+          <span class="badge badge-success">{{ task.status }}</span>
+        </header>
+
+        <dl class="task-info">
+          <dt>Descripción:</dt>
+          <dd>{{ task.description || 'Sin descripción' }}</dd>
+          
+          <dt>Semana:</dt>
+          <dd>{{ task.weekNumber }}</dd>
+          
+          <dt>Sesión:</dt>
+          <dd>{{ task.sessionNumber }}</dd>
+          
+          <dt>Fecha límite:</dt>
+          <dd>{{ task.deadline ? (task.deadline | date:'fullDate') : 'Sin límite' }}</dd>
+          
+          <dt>Tipos permitidos:</dt>
+          <dd>{{ task.allowedTypes.join(', ') }}</dd>
+          
+          <dt>Tamaño máximo:</dt>
+          <dd>{{ task.maxFileSize / 1048576 }} MB</dd>
+          
+          <dt>Máximo de archivos:</dt>
+          <dd>{{ task.maxFiles }}</dd>
+          
+          <dt>Tipo de calificación:</dt>
+          <dd>{{ task.gradingType }}</dd>
+          
+          <dt>Puntaje máximo:</dt>
+          <dd>{{ task.maxScore || 'No definido' }}</dd>
+        </dl>
+
+        <section class="submissions" *ngIf="submissions.length > 0" aria-labelledby="submissions-title">
+          <h2 id="submissions-title">Entregas de Estudiantes</h2>
+          <table class="submissions-table" aria-label="Lista de entregas">
+            <thead>
+              <tr>
+                <th scope="col">Estudiante</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Fecha de entrega</th>
+                <th scope="col">Calificación</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let submission of submissions">
+                <td>
+                  <strong>{{ getStudentInfo(submission).name }}</strong>
+                  <div class="student-dni">DNI: {{ getStudentInfo(submission).dni }}</div>
+                </td>
+                <td>
+                  <span class="badge" 
+                        [class.badge-success]="submission.status === 'entregado' || submission.status === 'revisado'"
+                        [class.badge-danger]="submission.status === 'fuera_de_fecha'">
+                    {{ submission.status }}
+                  </span>
+                </td>
+                <td>{{ submission.submittedAt | date:'short' }}</td>
+                <td>{{ submission.score !== null ? submission.score : '--' }}</td>
+                <td>
+                  <button class="btn btn-secondary" (click)="viewSubmission(submission)">
+                    Ver
+                  </button>
+                  <button class="btn btn-primary" (click)="gradeSubmission(submission)">
+                    Calificar
+                  </button>
+                  <button class="btn btn-danger" (click)="removeSubmission(submission)" *ngIf="isTeacherView"
+                          matTooltip="Eliminar esta entrega">
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="not-submitted" *ngIf="notSubmitted.length > 0" aria-labelledby="not-submitted-title">
+          <h2 id="not-submitted-title">Estudiantes que aún no entregan ({{ notSubmitted.length }})</h2>
+          <ul class="not-submitted-list">
+            <li *ngFor="let s of notSubmitted">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ s.name }}</span>
+              <span class="student-dni">DNI: {{ s.dni }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <nav class="task-actions" aria-label="Acciones de la tarea">
+          <button class="btn btn-secondary" [routerLink]="['..']">Volver</button>
+          <button class="btn btn-primary" (click)="editTask()">Editar</button>
+        </nav>
+      </div>
+    </section>
+  

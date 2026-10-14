@@ -1,0 +1,146 @@
+<section class="course-form-container" aria-labelledby="form-title">
+  <header class="form-header">
+    <div class="form-header-left">
+      <app-back-button></app-back-button>
+      <div>
+        <h1 id="form-title">{{ isEdit ? 'Editar Curso' : 'Nuevo Curso' }}</h1>
+        <p class="form-subtitle">{{ isEdit ? 'Actualiza la información del curso' : 'Completa los datos para crear un nuevo curso' }}</p>
+      </div>
+    </div>
+  </header>
+
+  <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="course-form">
+    <fieldset>
+      <legend class="sr-only">Información del curso</legend>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del curso</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Cuidados Básicos de Enfermería" />
+          <mat-icon matPrefix>school</mat-icon>
+          <mat-error *ngIf="courseForm.get('name')?.hasError('required')">Nombre requerido</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Código del curso</mat-label>
+          <input matInput formControlName="code" placeholder="Ej: ENFER-101" />
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-error *ngIf="courseForm.get('code')?.hasError('required')">Código requerido</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Carrera</mat-label>
+          <mat-select formControlName="career">
+            <mat-option value="">Seleccione una carrera</mat-option>
+            <mat-option value="Empleabilidad">Empleabilidad</mat-option>
+            <mat-option value="Técnica">Técnica</mat-option>
+            <mat-option value="Laboratorio">Laboratorio</mat-option>
+            <mat-option value="Enfermería">Enfermería</mat-option>
+            <mat-option value="Farmacia">Farmacia</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>menu_book</mat-icon>
+          <mat-error *ngIf="courseForm.get('career')?.hasError('required')">Carrera requerida</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="activo">Activo</mat-option>
+            <mat-option value="finalizado">Finalizado</mat-option>
+            <mat-option value="caducado">Caducado</mat-option>
+            <mat-option value="archivado">Archivado</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>flag</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width teacher-select-field" *ngIf="isAdmin">
+        <mat-label>Designar docente</mat-label>
+        <mat-select formControlName="teacherId">
+          <mat-option value="">Sin asignar</mat-option>
+          <mat-option *ngFor="let d of docentes" [value]="d._id">{{ d.names }} {{ d.lastNames }} ({{ d.institutionalEmail }})</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>person</mat-icon>
+        <mat-hint>El docente podrá gestionar este curso</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width description-field">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" rows="6" placeholder="Describe brevemente el contenido del curso..."></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Créditos</mat-label>
+          <input matInput type="number" formControlName="credits" min="0" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Año</mat-label>
+          <input matInput type="number" formControlName="year" min="2000" max="2100" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Semestre</mat-label>
+          <mat-select formControlName="semester">
+            <mat-option [value]="1">Semestre I</mat-option>
+            <mat-option [value]="2">Semestre II</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Ciclo</mat-label>
+          <mat-select formControlName="cycle">
+            <mat-option [value]="1">I</mat-option>
+            <mat-option [value]="2">II</mat-option>
+            <mat-option [value]="3">III</mat-option>
+            <mat-option [value]="4">IV</mat-option>
+            <mat-option [value]="5">V</mat-option>
+            <mat-option [value]="6">VI</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de inicio</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          <mat-icon matPrefix>calendar_today</mat-icon>
+          <mat-error *ngIf="courseForm.get('startDate')?.hasError('required')">Fecha requerida</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de fin</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+          <mat-icon matPrefix>event</mat-icon>
+          <mat-error *ngIf="courseForm.get('endDate')?.hasError('required')">Fecha requerida</mat-error>
+          <mat-error *ngIf="courseForm.hasError('dateRangeInvalid') && courseForm.get('endDate')?.touched">
+            Debe ser posterior a la fecha de inicio
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </fieldset>
+
+    <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <div class="form-actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="courseForm.invalid || isLoading">
+        <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+        <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear Curso' }}</span>
+        <span *ngIf="isLoading">Guardando...</span>
+      </button>
+      <button mat-stroked-button type="button" routerLink="/courses">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</section>

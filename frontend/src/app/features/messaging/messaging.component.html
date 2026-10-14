@@ -1,0 +1,28 @@
+<div class="messaging-container">
+  <div class="messaging-header">
+    <div class="messaging-header-left">
+      <h1>Mensajería</h1>
+      <span
+        class="connection-chip"
+        [class.online]="store.connected()"
+        [class.offline]="!store.connected()"
+      >
+        <span class="connection-dot"></span>
+        {{ store.connected() ? 'Conectado' : 'Sin conexión' }}
+      </span>
+    </div>
+    <span class="total-unread" *ngIf="store.totalUnread() > 0">
+      {{ store.totalUnread() }} no leído{{ store.totalUnread() === 1 ? '' : 's' }}
+    </span>
+  </div>
+
+  <div class="messaging-layout">
+    <aside class="conversations-pane">
+      <app-conversation-list></app-conversation-list>
+    </aside>
+
+    <section class="detail-pane">
+      <app-conversation-detail></app-conversation-detail>
+    </section>
+  </div>
+</div>

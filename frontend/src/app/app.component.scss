@@ -1,0 +1,255 @@
+.app-toolbar {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-white);
+  height: auto;
+  min-height: 74px;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.toolbar-content {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0.75rem 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.logo-section {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.toolbar-logo {
+  height: 50px;
+  width: auto;
+}
+
+.toolbar-title {
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-white);
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    margin: 0;
+    opacity: 0.9;
+    color: var(--color-secondary);
+  }
+}
+
+.nav-menu {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-width: 0;
+  gap: clamp(0.125rem, 0.35vw, 0.5rem);
+  align-items: center;
+}
+
+.nav-menu button {
+  flex: 0 1 auto;
+  min-width: 0;
+  padding-inline: clamp(0.4rem, 0.6vw, 1rem);
+  color: var(--color-white);
+  position: relative;
+  
+  &:hover,
+  &.active {
+    background: rgba(255,255,255,0.2);
+  }
+
+  mat-icon {
+    margin-right: 0.5rem;
+    
+    @media (max-width: 768px) {
+      margin-right: 0;
+    }
+  }
+
+  span {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    margin-left: 0.35rem;
+    border-radius: 9px;
+    background: var(--color-secondary);
+    color: var(--color-gray-dark);
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+
+    @media (max-width: 768px) {
+      display: inline-flex; // mantener visible el conteo en mobile
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+  }
+}
+
+@media (max-width: 1800px) {
+  .toolbar-title .subtitle {
+    display: none;
+  }
+
+  .toolbar-content {
+    padding-inline: 16px;
+  }
+}
+
+/* En portátiles se conservan todas las acciones mediante sus iconos. */
+@media (max-width: 1450px) {
+  .nav-menu button {
+    flex: 0 0 48px;
+    width: 48px;
+    padding-inline: 0;
+
+    mat-icon {
+      margin-right: 0;
+    }
+
+    span:not(.nav-badge) {
+      display: none;
+    }
+  }
+}
+
+// Responsive: mobile menu
+@media (max-width: 768px) {
+  .toolbar-content {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .nav-menu {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-menu button {
+    padding: 0.5rem;
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+.profile-fab {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 50;
+
+  // Mobile: mantenerlo despejado de los bordes sin tapar contenido.
+  @media (max-width: 768px) {
+    bottom: 1.25rem;
+    left: 1.25rem;
+  }
+}
+
+.trash-fab {
+  position: fixed;
+  bottom: 6.5rem;
+  left: 2rem;
+  z-index: 50;
+
+  // Mobile: espejar la media query del profile-fab para que ambos FABs
+  // queden apilados sin colisión (Spec R2).
+  @media (max-width: 768px) {
+    left: 1.25rem;
+  }
+}
+
+.app-main {
+  min-height: calc(100vh - 140px);
+  padding: 2rem 20px;
+  background: #f5f7fa;
+
+  &.login-main {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 0;
+    background: transparent;
+  }
+}
+
+.app-footer {
+  background: var(--color-primary);
+  color: var(--color-white);
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+
+  .footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.nav-user-greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 0.75rem;
+  padding-right: 0.75rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+  line-height: 1.2;
+
+  .greeting-role {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-secondary);
+    opacity: 0.95;
+  }
+
+  .greeting-name {
+    font-size: 0.9rem;
+    color: #fff;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+}
+
+/* El nombre y el rol son informativos; el menú tiene prioridad de espacio. */
+@media (max-width: 2200px) {
+  .nav-user-greeting {
+    display: none;
+  }
+}

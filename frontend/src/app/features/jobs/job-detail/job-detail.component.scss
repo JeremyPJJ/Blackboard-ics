@@ -1,0 +1,162 @@
+.detail-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.back-link {
+  margin-bottom: 16px;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b3261e;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}
+
+.detail-card {
+  mat-card-header {
+    margin-bottom: 8px;
+  }
+
+  .job-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tag {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &--career {
+      background: #e8eaf6;
+      color: #3949ab;
+    }
+
+    &--modality {
+      background: #e0f2f1;
+      color: #00695c;
+    }
+
+    &--status-active {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &--status-inactive {
+      background: #eeeeee;
+      color: #616161;
+    }
+  }
+
+  .job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: rgba(0, 0, 0, 0.6);
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .section {
+    margin-top: 20px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .pre-line {
+      white-space: pre-line;
+      margin: 0;
+      color: rgba(0, 0, 0, 0.75);
+      line-height: 1.6;
+    }
+
+    .requirements {
+      margin: 0;
+      padding-left: 20px;
+      color: rgba(0, 0, 0, 0.75);
+
+      li {
+        margin-bottom: 4px;
+      }
+    }
+
+    .contact {
+      display: flex;
+      gap: 16px;
+      margin: 0;
+      color: rgba(0, 0, 0, 0.75);
+    }
+  }
+
+  .detail-actions {
+    padding: 16px;
+    gap: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    .my-application {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #2e7d32;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      .app-status {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: #e8f5e9;
+        color: #2e7d32;
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        &--finalista {
+          background: #fff8e1;
+          color: #f57f17;
+        }
+      }
+    }
+
+    .deadline-note {
+      margin: 0;
+      color: rgba(0, 0, 0, 0.55);
+      font-size: 0.85rem;
+    }
+  }
+}

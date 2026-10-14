@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Iniciar reunión</h2>
+<mat-dialog-content>
+  <p>Eres la primera persona en entrar a la sala. Puedes darle un título a esta reunión (opcional).</p>
+  <mat-form-field appearance="outline" class="title-field">
+    <mat-label>Título de la reunión</mat-label>
+    <input
+      matInput
+      [(ngModel)]="title"
+      placeholder="Reunión"
+      maxlength="120"
+      autocomplete="off"
+    />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="skip()">Unirse sin título</button>
+  <button mat-raised-button color="primary" type="button" (click)="confirm()">
+    Iniciar reunión
+  </button>
+</mat-dialog-actions>

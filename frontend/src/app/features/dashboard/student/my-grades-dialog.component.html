@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>Mis Notas</h2>
+<mat-dialog-content>
+  <div class="draft-banner" role="alert">
+    <mat-icon>info</mat-icon>
+    <div>
+      <strong>Notas en borrador</strong>
+      <p>Las notas que ves aquí son preliminares. Las notas oficiales que cuentan son las del <strong>Q10</strong> (quinto trimestre / corte final).</p>
+    </div>
+  </div>
+
+  <app-student-grades (courseSelected)="onCourseSelected($event)"></app-student-grades>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cerrar</button>
+</mat-dialog-actions>

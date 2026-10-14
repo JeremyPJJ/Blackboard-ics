@@ -1,0 +1,55 @@
+<section class="task-list-container" aria-labelledby="task-list-title">
+  <header class="page-header">
+    <div class="page-header-left">
+      <app-back-button></app-back-button>
+      <h1 id="task-list-title">Tareas del Curso</h1>
+    </div>
+    <button class="btn btn-primary" (click)="createTask()" *ngIf="can('tareas.crear')">
+      + Nueva Tarea
+    </button>
+  </header>
+
+  <app-loading-message *ngIf="isLoading" message="Cargando tareas..."></app-loading-message>
+
+  <app-empty-state *ngIf="!isLoading && tasks.length === 0" message="No hay tareas en este curso">
+    <button class="btn btn-primary" (click)="createTask()">Crear primera tarea</button>
+  </app-empty-state>
+
+  <ul class="task-list" *ngIf="!isLoading && tasks.length > 0" aria-label="Lista de tareas">
+    <li class="task-card" *ngFor="let task of tasks">
+      <header class="task-header">
+        <h3>{{ task.title }}</h3>
+        <span class="badge" [class.badge-success]="task.status === 'publicada'"
+                     [class.badge-warning]="task.status === 'borrador'">
+          {{ task.status }}
+        </span>
+      </header>
+
+      <dl class="task-info">
+        <dt>Semana:</dt>
+        <dd>{{ task.weekNumber }}</dd>
+
+        <dt>Sesión:</dt>
+        <dd>{{ task.sessionNumber }}</dd>
+
+        <dt>Fecha límite:</dt>
+        <dd>{{ task.deadline ? (task.deadline | date:'fullDate') : 'Sin límite' }}</dd>
+
+        <dt>Tipo de calificación:</dt>
+        <dd>{{ task.gradingType }}</dd>
+      </dl>
+
+      <nav class="task-actions" aria-label="Acciones de la tarea">
+        <button class="btn btn-primary" [routerLink]="[task._id]">
+          Ver Detalle
+        </button>
+        <button class="btn btn-secondary" (click)="editTask(task)" *ngIf="can('tareas.editar')">
+          Editar
+        </button>
+        <button class="btn btn-danger" (click)="deleteTask(task._id)" *ngIf="can('tareas.eliminar')">
+          Eliminar
+        </button>
+      </nav>
+    </li>
+  </ul>
+</section>

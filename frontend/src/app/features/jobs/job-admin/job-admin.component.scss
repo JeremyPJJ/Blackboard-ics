@@ -1,0 +1,222 @@
+.admin-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+  }
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b3261e;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}
+
+.tab-body {
+  padding: 24px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-card {
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+
+    .span-2 {
+      grid-column: span 2;
+    }
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+  }
+}
+
+.table-card {
+  .jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    th {
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .cell-strong {
+      font-weight: 500;
+    }
+
+    .col-actions {
+      text-align: right;
+      white-space: nowrap;
+    }
+  }
+
+  .status-chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &--active {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    &--inactive {
+      background: #eeeeee;
+      color: #616161;
+    }
+  }
+}
+
+.empty-row {
+  padding: 20px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.offer-select {
+  width: 100%;
+  max-width: 480px;
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.applications-card {
+  .application-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .application-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .application-student {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .application-meta {
+      margin: 4px 0 8px;
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0.55);
+    }
+
+    .application-letter {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #f5f5f5;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.75);
+      white-space: pre-line;
+    }
+
+    .application-attachments {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+
+      .attachments-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: rgba(0, 0, 0, 0.55);
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      .file-link {
+        font-size: 0.8125rem;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+
+    .application-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+
+      mat-form-field {
+        width: 180px;
+      }
+    }
+  }
+}

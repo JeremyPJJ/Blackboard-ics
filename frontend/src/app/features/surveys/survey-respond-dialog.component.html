@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>{{ survey.title }}</h2>
+<mat-dialog-content>
+  <p class="desc" *ngIf="survey.description">{{ survey.description }}</p>
+  <div class="question" *ngFor="let q of survey.questions; let qi = index">
+    <p class="q-text">{{ qi + 1 }}. {{ q.text }} <span *ngIf="q.required" class="req">*</span></p>
+
+    <mat-radio-group *ngIf="q.type === 'seleccion_unica'" [(ngModel)]="answers[qi]" name="q{{qi}}">
+      <mat-radio-button *ngFor="let o of q.options" [value]="o.text">{{ o.text }}</mat-radio-button>
+    </mat-radio-group>
+
+    <div *ngIf="q.type === 'seleccion_multiple'">
+      <mat-checkbox *ngFor="let o of q.options" (change)="toggleMulti(qi, o.text)" color="primary">{{ o.text }}</mat-checkbox>
+    </div>
+
+    <mat-form-field *ngIf="q.type === 'escala'" appearance="outline">
+      <mat-select [(ngModel)]="answers[qi]" name="scale{{qi}}" placeholder="Elige un valor">
+        <mat-option *ngFor="let v of scaleValues(q)" [value]="v">{{ v }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field *ngIf="q.type === 'texto'" appearance="outline" class="full-width">
+      <textarea matInput [(ngModel)]="answers[qi]" name="text{{qi}}" rows="2"></textarea>
+    </mat-form-field>
+  </div>
+  <p *ngIf="survey.isAnonymous" class="anon">Encuesta anónima — tu identidad no quedará registrada.</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!complete()" (click)="submit()">Enviar</button>
+</mat-dialog-actions>

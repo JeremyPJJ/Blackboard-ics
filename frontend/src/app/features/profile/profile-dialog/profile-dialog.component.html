@@ -1,0 +1,99 @@
+<h2 mat-dialog-title>Mi perfil</h2>
+
+<mat-dialog-content>
+  <!-- Datos del usuario (Spec: muestra datos del perfil) -->
+  <div class="profile-info" *ngIf="user">
+    <div class="profile-row">
+      <span class="profile-label">Nombre</span>
+      <span class="profile-value">{{ user.names }} {{ user.lastNames }}</span>
+    </div>
+    <div class="profile-row">
+      <span class="profile-label">Correo</span>
+      <span class="profile-value">{{ user.institutionalEmail }}</span>
+    </div>
+    <div class="profile-row" *ngIf="user.role">
+      <span class="profile-label">Rol</span>
+      <span class="profile-value">{{ user.role }}</span>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+
+  <!-- Mis notificaciones (Spec N2: el navbar ya no tiene campana) -->
+  <button mat-button class="notifications-link" (click)="openNotifications()">
+    <mat-icon>notifications</mat-icon>
+    <span>Mis notificaciones</span>
+  </button>
+  <mat-divider></mat-divider>
+
+  <!-- Mis cursos (Spec O8: docente → a cargo; staff → activos) -->
+  <div class="profile-courses" *ngIf="showCoursesSection">
+    <h3 class="section-title">Mis cursos</h3>
+    <mat-spinner *ngIf="coursesLoading" diameter="20" class="button-spinner"></mat-spinner>
+    <ng-container *ngIf="!coursesLoading">
+      <div class="course-item" *ngFor="let course of courses">
+        <button mat-button class="course-link" (click)="goToCourse(course._id)">
+          <mat-icon>school</mat-icon>
+          <span>{{ course.name }}</span>
+        </button>
+      </div>
+      <p *ngIf="courses.length === 0" class="courses-empty">Sin cursos</p>
+    </ng-container>
+    <mat-divider></mat-divider>
+  </div>
+
+  <!-- super_admin no lleva cursos (Spec N1): empty-state explicativo, sin "Mis cursos" -->
+  <div class="profile-courses" *ngIf="isSuperAdmin">
+    <p class="courses-empty">Los administradores no tienen cursos asignados</p>
+    <mat-divider></mat-divider>
+  </div>
+
+  <h3 class="section-title">Cambiar contraseña</h3>
+
+  <!-- Mensaje de éxito -->
+  <mat-card class="result-card success-card" *ngIf="success">
+    <p>{{ success }}</p>
+  </mat-card>
+
+  <!-- Error (401 contraseña actual incorrecta / 400 validación / 429 rate-limit) -->
+  <mat-card class="result-card error-card" *ngIf="error">
+    <p>{{ error }}</p>
+  </mat-card>
+
+  <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="password-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Contraseña actual</mat-label>
+      <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
+      <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+        Ingresa tu contraseña actual
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nueva contraseña</mat-label>
+      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+      <mat-hint>Mínimo 8 caracteres, al menos una letra y un número.</mat-hint>
+      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+        Ingresa la nueva contraseña
+      </mat-error>
+      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+        Debe tener al menos 8 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirmar nueva contraseña</mat-label>
+      <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+      <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+        Las contraseñas no coinciden
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="submitting">Cancelar</button>
+  <button mat-raised-button color="primary" type="submit" (click)="onChangePassword()" [disabled]="passwordForm.invalid || submitting">
+    <mat-spinner *ngIf="submitting" diameter="18" class="button-spinner"></mat-spinner>
+    <span *ngIf="!submitting">Cambiar contraseña</span>
+  </button>
+</mat-dialog-actions>

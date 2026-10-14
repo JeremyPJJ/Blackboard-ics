@@ -1,0 +1,43 @@
+<section class="forums-container" aria-labelledby="forums-title">
+  <header class="page-header">
+    <div class="page-header-left">
+      <app-back-button></app-back-button>
+      <div>
+        <h1 id="forums-title">Foros del Curso</h1>
+        <p class="page-subtitle">Participa en los debates y discusiones del curso</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" *ngIf="can('foros.crear')" (click)="openCreate()">
+      <mat-icon>add</mat-icon> Nuevo Foro
+    </button>
+  </header>
+
+  <app-loading-message *ngIf="isLoading" message="Cargando foros..."></app-loading-message>
+
+  <app-empty-state *ngIf="!isLoading && forums.length === 0" message="No hay foros en este curso">
+    <button class="btn btn-primary" *ngIf="can('foros.crear')" (click)="openCreate()">Crear primer foro</button>
+  </app-empty-state>
+
+  <div class="forums-grid" *ngIf="!isLoading && forums.length > 0">
+    <div class="forum-card" *ngFor="let forum of forums">
+      <div class="forum-card-top">
+        <div>
+          <h3>{{ forum.title }}</h3>
+          <p class="forum-meta" *ngIf="forum.description">{{ forum.description }}</p>
+        </div>
+        <div class="forum-badges">
+          <span class="badge badge-success" *ngIf="forum.isEvaluated">Evaluado</span>
+          <span class="badge badge-info" *ngIf="forum.isPinned">Fijado</span>
+          <span class="badge badge-warning" *ngIf="forum.isLocked">Cerrado</span>
+        </div>
+      </div>
+      <div class="forum-stats">
+        <span>Semana {{ forum.weekNumber }} · Sesión {{ forum.sessionNumber }}</span>
+        <span>{{ forum.posts.length }} publicaciones</span>
+      </div>
+      <button class="btn btn-primary btn-block" [routerLink]="['/courses', courseId, 'forums', forum._id]">
+        Ver Foro
+      </button>
+    </div>
+  </div>
+</section>

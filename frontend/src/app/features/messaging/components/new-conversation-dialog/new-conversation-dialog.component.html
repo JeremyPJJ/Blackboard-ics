@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>Nueva conversación</h2>
+
+<mat-dialog-content>
+  <div *ngIf="loading" class="dialog-loading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando...</span>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <mat-form-field appearance="fill" class="full-width" *ngIf="!isSuperAdmin">
+      <mat-label>Curso</mat-label>
+      <mat-select
+        [(ngModel)]="selectedCourseId"
+        (selectionChange)="onCourseChange()"
+      >
+        <mat-option *ngFor="let course of courses" [value]="course.id">
+          {{ course.name }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>Selecciona el curso para elegir participantes</mat-hint>
+    </mat-form-field>
+
+    <p *ngIf="!isSuperAdmin && courses.length === 0" class="picker-empty">
+      No tienes cursos donde iniciar una conversación
+    </p>
+
+    <ng-container *ngIf="showPicker">
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Buscar participante</mat-label>
+        <input matInput [(ngModel)]="filter" placeholder="Nombre o apellidos">
+      </mat-form-field>
+
+      <div class="picker-list">
+        <mat-checkbox
+          *ngFor="let option of filteredOptions"
+          [checked]="selectedIds.includes(option.id)"
+          (change)="toggle(option.id, $event.checked)"
+        >
+          {{ option.name }}
+          <span class="option-role">{{ roleLabel(option.role) }}</span>
+        </mat-checkbox>
+
+        <p *ngIf="filteredOptions.length === 0" class="picker-empty">
+          Sin participantes disponibles
+        </p>
+      </div>
+    </ng-container>
+
+    <mat-form-field appearance="fill" class="full-width" *ngIf="selectedIds.length > 1">
+      <mat-label>Nombre de la conversación (opcional)</mat-label>
+      <input matInput [(ngModel)]="name" placeholder="Ej: Grupo de práctica">
+    </mat-form-field>
+  </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!canSave"
+    (click)="save()"
+  >
+    {{ saving ? 'Creando...' : 'Crear conversación' }}
+  </button>
+</mat-dialog-actions>

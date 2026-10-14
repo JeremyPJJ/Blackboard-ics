@@ -1,0 +1,123 @@
+﻿
+    <section class="attendance-container" aria-labelledby="attendance-title">
+      <header class="page-header">
+        <div class="page-header-left">
+          <app-back-button></app-back-button>
+          <div>
+            <h1 id="attendance-title">Registro de Asistencia</h1>
+            <p class="page-subtitle">Gestiona las sesiones y marca la asistencia de los estudiantes</p>
+          </div>
+        </div>
+      </header>
+
+      <app-loading-message *ngIf="isLoading" message="Cargando registro de asistencia..."></app-loading-message>
+
+      <app-empty-state *ngIf="!isLoading && !register" message="No hay registro de asistencia para este curso">
+        <button class="btn btn-primary" (click)="createRegister()" *ngIf="can('asistencia.registrar')">Crear registro</button>
+      </app-empty-state>
+
+      <div *ngIf="!isLoading && register && register.dates.length === 0" class="attendance-empty">
+        <h3>Registro creado</h3>
+        <p *ngIf="can('asistencia.registrar')">Agrega las sesiones (día y hora de clase) para empezar a marcar asistencia.</p>
+        <p *ngIf="!can('asistencia.registrar')">El docente aún no ha agregado sesiones de clase.</p>
+      </div>
+
+      <div *ngIf="!isLoading && register">
+        <!-- Formulario para agregar sesión -->
+        <section class="add-session-section" aria-labelledby="add-session-title" *ngIf="can('asistencia.registrar')">
+          <h3 id="add-session-title">Agregar Sesión de Clase</h3>
+          <form (ngSubmit)="addSession()" class="session-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Semana</mat-label>
+              <input matInput type="number" [(ngModel)]="sessionWeek" name="week" min="1" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Sesión</mat-label>
+              <input matInput type="number" [(ngModel)]="sessionNumber" name="session" min="1" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de clase</mat-label>
+              <input matInput [matDatepicker]="datePicker" [(ngModel)]="sessionDate" name="date" required />
+              <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+              <mat-datepicker #datePicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Hora inicio</mat-label>
+              <input matInput type="time" [(ngModel)]="sessionStart" name="start" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Hora fin</mat-label>
+              <input matInput type="time" [(ngModel)]="sessionEnd" name="end" required />
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="savingSession">
+              {{ savingSession ? 'Guardando...' : 'Agregar Sesión' }}
+            </button>
+          </form>
+        </section>
+
+        <!-- Sesiones existentes -->
+        <div *ngIf="register.dates.length > 0" class="attendance-content">
+          <section *ngFor="let date of register.dates; let i = index" class="attendance-date" [attr.aria-labelledby]="'date-title-' + i">
+            <h2 [id]="'date-title-' + i">
+              Semana {{ date.weekNumber }} - Sesión {{ date.sessionNumber }}
+            </h2>
+            <p class="date-info">
+              {{ date.date | date:'fullDate' }} |
+              {{ date.startTime | date:'shortTime' }} - {{ date.endTime | date:'shortTime' }}
+            </p>
+
+            <table class="attendance-table" aria-label="Asistencia de la sesión">
+              <thead>
+                <tr>
+                  <th scope="col">Estudiante</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Hora de marca</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of courseStudents">
+                  <td>{{ student.name }}</td>
+                  <td>
+                    <span class="badge"
+                          [class.badge-success]="getRecord(i, student.id)?.status === 'presente'"
+                          [class.badge-warning]="getRecord(i, student.id)?.status === 'tardanza'"
+                          [class.badge-danger]="getRecord(i, student.id)?.status === 'ausente'"
+                          [class.badge-info]="getRecord(i, student.id)?.status === 'justificado'">
+                      {{ getRecord(i, student.id)?.status || 'sin marcar' }}
+                    </span>
+                  </td>
+                  <td>{{ getRecord(i, student.id)?.markedAt | date:'shortTime' }}</td>
+                  <td>
+                    <mat-select
+                      *ngIf="!getRecord(i, student.id)?.status"
+                      class="mark-select"
+                      placeholder="Marcar"
+                      (selectionChange)="markStudent(i, student.id, $event.value)"
+                    >
+                      <mat-option value="presente">Presente</mat-option>
+                      <mat-option value="ausente">Ausente</mat-option>
+                      <mat-option value="tardanza">Tardanza</mat-option>
+                      <mat-option value="justificado">Justificado</mat-option>
+                    </mat-select>
+                    <button
+                      *ngIf="getRecord(i, student.id)?.status"
+                      class="btn btn-secondary btn-sm"
+                      (click)="modifyAttendance(i, getRecord(i, student.id))"
+                    >
+                      Modificar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </div>
+    </section>
+  

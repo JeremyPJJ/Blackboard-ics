@@ -1,0 +1,49 @@
+<div class="conversation-detail">
+  <ng-container *ngIf="store.selectedConversation() as conversation; else emptyState">
+    <div class="detail-header">
+      <h2>{{ store.displayNameFor(conversation) }}</h2>
+      <span class="participant-count">
+        {{ conversation.participants.length }} participante{{ conversation.participants.length === 1 ? '' : 's' }}
+      </span>
+    </div>
+
+    <div class="messages-container" #messagesContainer>
+      <div *ngIf="store.loadingMessages()" class="messages-loading">
+        <mat-spinner diameter="28"></mat-spinner>
+        <span>Cargando mensajes...</span>
+      </div>
+
+      <div
+        class="message-row"
+        *ngFor="let message of store.messages()"
+        [class.mine]="isMine(message.senderId)"
+      >
+        <div class="message-bubble">
+          <span class="message-sender" *ngIf="!isMine(message.senderId)">
+            {{ senderName(message.senderId) }}
+          </span>
+          <p class="message-content">{{ message.content }}</p>
+          <span class="message-time">{{ store.formatTime(message.sentAt) }}</span>
+        </div>
+      </div>
+
+      <div
+        *ngIf="!store.loadingMessages() && store.messages().length === 0"
+        class="messages-empty"
+      >
+        <mat-icon>chat_bubble_outline</mat-icon>
+        <p>Envía el primer mensaje de esta conversación</p>
+      </div>
+    </div>
+
+    <app-message-input></app-message-input>
+  </ng-container>
+
+  <ng-template #emptyState>
+    <div class="detail-empty">
+      <mat-icon>chat</mat-icon>
+      <h3>Selecciona una conversación</h3>
+      <p>Elige una conversación del listado para ver sus mensajes</p>
+    </div>
+  </ng-template>
+</div>

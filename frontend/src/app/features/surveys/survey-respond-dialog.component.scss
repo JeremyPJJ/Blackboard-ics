@@ -1,0 +1,32 @@
+.desc {
+  color: var(--color-text-light);
+}
+
+.question {
+  margin-bottom: 1.25rem;
+}
+
+.q-text {
+  font-weight: 600;
+  color: var(--color-gray-dark);
+}
+
+.req {
+  color: var(--color-danger);
+}
+
+mat-radio-button,
+mat-checkbox {
+  display: block;
+  margin: 0.25rem 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.anon {
+  color: var(--color-text-light);
+  font-size: 0.8125rem;
+  font-style: italic;
+}

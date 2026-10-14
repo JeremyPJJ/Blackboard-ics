@@ -1,0 +1,113 @@
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 8px;
+
+  .profile-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    .profile-label {
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .profile-value {
+      text-align: right;
+      word-break: break-word;
+    }
+  }
+
+  mat-divider {
+    margin-top: 12px;
+  }
+}
+
+.section-title {
+  margin: 16px 0 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.profile-courses {
+  .course-item {
+    margin-bottom: 4px;
+  }
+
+  .course-link {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    text-transform: none;
+    font-weight: 400;
+
+    mat-icon {
+      margin-right: 8px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .courses-empty {
+    margin: 4px 0;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.notifications-link {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  text-transform: none;
+  font-weight: 400;
+  margin: 8px 0 0;
+
+  mat-icon {
+    margin-right: 8px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.result-card {
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.success-card {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.error-card {
+  background-color: #fdecea;
+  color: #c62828;
+}
+
+mat-dialog-content {
+  min-width: 380px;
+  max-width: 480px;
+}
+
+.button-spinner {
+  display: inline-block;
+  vertical-align: middle;
+}

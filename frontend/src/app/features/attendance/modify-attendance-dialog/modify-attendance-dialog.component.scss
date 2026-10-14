@@ -1,0 +1,23 @@
+.attendance-info {
+  background: var(--color-gray);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+.radio-group {
+  margin-bottom: 1rem;
+
+  mat-radio-button {
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.full-width {
+  width: 100%;
+}

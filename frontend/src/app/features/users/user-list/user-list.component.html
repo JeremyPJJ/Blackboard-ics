@@ -1,0 +1,123 @@
+<section class="user-list-container" aria-labelledby="user-list-title">
+  <header class="page-header">
+    <div>
+      <h1 id="user-list-title">Gestión de Usuarios</h1>
+      <p class="page-subtitle">Administra los usuarios del sistema</p>
+    </div>
+    <button class="btn btn-primary" routerLink="/users/new" *ngIf="can('usuarios.crear')">
+      <mat-icon>person_add</mat-icon> Nuevo Usuario
+    </button>
+  </header>
+
+  <div class="filters-card">
+    <div class="filters">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar usuario</mat-label>
+        <input matInput [(ngModel)]="searchTerm" name="search" placeholder="DNI, nombre o correo..." (ngModelChange)="loadUsers()">
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="searchTerm" matSuffix mat-icon-button type="button" (click)="searchTerm = ''; loadUsers()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Rol</mat-label>
+        <mat-select [(ngModel)]="selectedRole" name="roleFilter" (ngModelChange)="loadUsers()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="super_admin">Super Administrador</mat-option>
+          <mat-option value="unidad_academica">Unidad Académica</mat-option>
+          <mat-option value="docente">Docente</mat-option>
+          <mat-option value="estudiante">Estudiante</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" name="statusFilter" (ngModelChange)="loadUsers()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="activo">Activo</mat-option>
+          <mat-option value="inactivo">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <app-loading-message *ngIf="isLoading" message="Cargando usuarios..."></app-loading-message>
+
+  <div class="error-state" *ngIf="hasError && !isLoading">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Error al cargar usuarios</h3>
+    <button class="btn btn-primary" (click)="loadUsers()">
+      <mat-icon>refresh</mat-icon> Reintentar
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && !hasError && users.length === 0">
+    <mat-icon>people_outline</mat-icon>
+    <h3>No se encontraron usuarios</h3>
+    <p *ngIf="searchTerm || selectedRole || selectedStatus">No hay usuarios que coincidan con los filtros.</p>
+    <p *ngIf="!searchTerm && !selectedRole && !selectedStatus">Crea el primer usuario para comenzar.</p>
+    <button class="btn btn-primary" routerLink="/users/new">
+      <mat-icon>person_add</mat-icon> Crear usuario
+    </button>
+  </div>
+
+  <div class="table-card" *ngIf="!isLoading && !hasError && users.length > 0">
+    <table mat-table [dataSource]="users" class="users-table">
+      <ng-container matColumnDef="dni">
+        <th mat-header-cell *matHeaderCellDef>DNI</th>
+        <td mat-cell *matCellDef="let user">{{ user.dni }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre Completo</th>
+        <td mat-cell *matCellDef="let user">
+          <div class="user-name">
+            <strong>{{ user.names }} {{ user.lastNames }}</strong>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Correo</th>
+        <td mat-cell *matCellDef="let user">{{ user.institutionalEmail }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Rol</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="role-chip" [class]="'role-' + user.role">{{ getRoleName(user.role) }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Estado</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="status-chip" [class]="'status-' + user.status">{{ user.status }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let user">
+          <button mat-icon-button color="primary" (click)="sendMessageTo(user._id)" *ngIf="isSuperAdmin" matTooltip="Enviar mensaje">
+            <mat-icon>chat</mat-icon>
+          </button>
+          <button mat-icon-button color="primary" [routerLink]="['/users', user._id, 'edit']" matTooltip="Editar" *ngIf="can('usuarios.editar')">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteUser(user._id)" *ngIf="can('usuarios.eliminar') && canDelete(user)" matTooltip="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div class="table-footer">
+      <p>Mostrando {{ users.length }} usuario{{ users.length !== 1 ? 's' : '' }}</p>
+    </div>
+  </div>
+</section>

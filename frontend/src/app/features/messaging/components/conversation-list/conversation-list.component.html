@@ -1,0 +1,143 @@
+<div class="conversation-list">
+  <button
+    type="button"
+    class="new-conversation-btn"
+    (click)="openNewConversation()"
+  >
+    <mat-icon>add</mat-icon>
+    Nueva conversación
+  </button>
+
+  <!-- Pestañas Activas / Archivadas (Spec N6) -->
+  <div class="list-tabs" role="tablist">
+    <button
+      type="button"
+      class="list-tab"
+      [class.active]="!store.showArchived()"
+      (click)="showActive()"
+      role="tab"
+    >
+      Activas
+    </button>
+    <button
+      type="button"
+      class="list-tab"
+      [class.active]="store.showArchived()"
+      (click)="showArchived()"
+      role="tab"
+    >
+      Archivadas
+    </button>
+  </div>
+
+  <div *ngIf="store.loadingConversations()" class="list-loading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando conversaciones...</span>
+  </div>
+
+  <!-- Conversaciones activas -->
+  <ng-container *ngIf="!store.showArchived()">
+    <button
+      type="button"
+      class="conversation-item"
+      *ngFor="let conversation of store.sortedConversations()"
+      [class.selected]="conversation._id === store.selectedConversationId()"
+      (click)="store.selectConversation(conversation._id)"
+    >
+      <div class="conversation-avatar">
+        <mat-icon>chat</mat-icon>
+      </div>
+      <div class="conversation-body">
+        <div class="conversation-top">
+          <span class="conversation-title">{{ store.displayNameFor(conversation) }}</span>
+          <span class="conversation-time" *ngIf="conversation.lastMessageAt">
+            {{ store.formatTime(conversation.lastMessageAt) }}
+          </span>
+        </div>
+        <div class="conversation-bottom">
+          <span class="conversation-preview">{{ store.lastMessagePreview(conversation) }}</span>
+          <span class="unread-badge" *ngIf="store.unreadCounts()[conversation._id]">
+            {{ store.unreadCounts()[conversation._id] }}
+          </span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="archive-btn"
+        (click)="archiveConversation(conversation, $event)"
+        matTooltip="Archivar conversación"
+        aria-label="Archivar conversación"
+      >
+        <mat-icon>archive</mat-icon>
+      </button>
+    </button>
+
+    <div
+      *ngIf="!store.loadingConversations() && store.conversations().length === 0"
+      class="list-empty"
+    >
+      <mat-icon>forum</mat-icon>
+      <p>No tienes conversaciones</p>
+      <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        (click)="openNewConversation()"
+      >
+        <mat-icon>add</mat-icon>
+        Iniciar conversación
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- Conversaciones archivadas (Spec N6) -->
+  <ng-container *ngIf="store.showArchived()">
+    <div *ngIf="store.loadingArchived()" class="list-loading">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span>Cargando archivadas...</span>
+    </div>
+
+    <button
+      type="button"
+      class="conversation-item"
+      *ngFor="let conversation of store.archivedConversations()"
+      [class.selected]="conversation._id === store.selectedConversationId()"
+      (click)="store.selectConversation(conversation._id)"
+    >
+      <div class="conversation-avatar archived-avatar">
+        <mat-icon>archive</mat-icon>
+      </div>
+      <div class="conversation-body">
+        <div class="conversation-top">
+          <span class="conversation-title">{{ store.displayNameFor(conversation) }}</span>
+          <span class="conversation-time" *ngIf="conversation.lastMessageAt">
+            {{ store.formatTime(conversation.lastMessageAt) }}
+          </span>
+        </div>
+        <div class="conversation-bottom">
+          <span class="conversation-preview">{{ store.lastMessagePreview(conversation) }}</span>
+          <span class="unread-badge" *ngIf="store.archivedUnreadCounts()[conversation._id]">
+            {{ store.archivedUnreadCounts()[conversation._id] }}
+          </span>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="archive-btn"
+        (click)="unarchiveConversation(conversation, $event)"
+        matTooltip="Restaurar conversación"
+        aria-label="Restaurar conversación"
+      >
+        <mat-icon>unarchive</mat-icon>
+      </button>
+    </button>
+
+    <div
+      *ngIf="!store.loadingArchived() && store.archivedConversations().length === 0"
+      class="list-empty"
+    >
+      <mat-icon>inbox</mat-icon>
+      <p>No tienes conversaciones archivadas</p>
+    </div>
+  </ng-container>
+</div>

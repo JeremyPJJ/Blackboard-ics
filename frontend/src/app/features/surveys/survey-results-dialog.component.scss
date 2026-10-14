@@ -1,0 +1,90 @@
+.toggle-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  button.active {
+    background: rgba(0, 51, 102, 0.12);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+.count {
+  color: var(--color-text-light);
+}
+
+.q-stats {
+  margin-bottom: 1.25rem;
+}
+
+.q-text {
+  font-weight: 600;
+  color: var(--color-gray-dark);
+}
+
+.dist-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.25rem 0;
+}
+
+.dist-key {
+  font-size: 0.8125rem;
+  color: var(--color-text-light);
+}
+
+.dist-bar {
+  background: #eef1f5;
+  border-radius: 6px;
+  height: 18px;
+  overflow: hidden;
+}
+
+.dist-fill {
+  height: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 18px;
+  padding-left: 0.4rem;
+  min-width: 20px;
+  white-space: nowrap;
+}
+
+.user-response {
+  border: 1px solid #e3e8ef;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 0.25rem;
+}
+
+.user-dni {
+  color: var(--color-text-light);
+  font-size: 0.8125rem;
+  margin: 0 0 0.5rem;
+}
+
+.user-answers {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0;
+}
+
+.q-label {
+  color: var(--color-text-light);
+}
+
+.a-value {
+  color: var(--color-gray-dark);
+}

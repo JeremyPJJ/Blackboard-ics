@@ -1,0 +1,392 @@
+<section class="course-detail" aria-labelledby="course-title">
+  <app-loading-message *ngIf="isLoading" message="Cargando detalle del curso..."></app-loading-message>
+
+  <div *ngIf="!isLoading && course" class="course-content">
+    <div class="back-row">
+      <app-back-button></app-back-button>
+    </div>
+    <header class="course-header">
+      <div>
+        <h1 id="course-title">{{ course.name }}</h1>
+        <p class="course-subtitle">{{ course.code }}</p>
+        <span class="badge career-badge">{{ course.career }}</span>
+      </div>
+    </header>
+
+    <mat-tab-group animationDuration="0ms" selectedIndex="1">
+      <!-- Vista: Información del curso -->
+      <mat-tab label="Información">
+        <dl class="course-info">
+          <dt>Descripción:</dt>
+          <dd>{{ course.description || 'Sin descripción' }}</dd>
+
+          <dt>Estado:</dt>
+          <dd>
+            <span class="badge" [class.badge-success]="course.status === 'activo'"
+                         [class.badge-warning]="course.status === 'finalizado'"
+                         [class.badge-danger]="course.status === 'archivado'">
+              {{ course.status }}
+            </span>
+          </dd>
+
+          <dt>Código para unirse:</dt>
+          <dd>
+            <span class="invite-code">{{ course.invitationConfig?.code }}</span>
+            <button mat-icon-button color="primary" class="copy-code-btn" (click)="copyInviteCode()" matTooltip="Copiar código" aria-label="Copiar código">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+          </dd>
+
+          <dt>Año / Semestre:</dt>
+          <dd>{{ course.year || '—' }} {{ course.semester ? ('- ' + (course.semester === 1 ? 'I' : 'II')) : '' }}</dd>
+
+          <dt>Ciclo:</dt>
+          <dd>{{ romanCycle(course.cycle) }}</dd>
+
+          <dt>Créditos:</dt>
+          <dd>{{ course.credits || '—' }}</dd>
+
+          <dt>Fecha de inicio:</dt>
+          <dd>{{ course.startDate | date:'fullDate' }}</dd>
+
+          <dt>Fecha de fin:</dt>
+          <dd>{{ course.endDate | date:'fullDate' }}</dd>
+        </dl>
+
+        <app-meetings-section [courseId]="courseId"></app-meetings-section>
+
+        <app-student-grades [courseId]="courseId" *ngIf="!isTeacherOrAdmin"></app-student-grades>
+
+        <section class="participants-section" aria-labelledby="teachers-title">
+          <h2 id="teachers-title">Docentes ({{ teachers.length }})</h2>
+          <div *ngIf="teachers.length > 0" class="participant-list">
+            <div class="participant-card" *ngFor="let teacher of teachers">
+              <div class="participant-avatar"><mat-icon>person</mat-icon></div>
+              <div class="participant-info">
+                <strong>{{ teacher.name }}</strong>
+                <span>{{ teacher.email }}<ng-container *ngIf="isStaff"> · DNI {{ teacher.dni }}</ng-container></span>
+                <span class="participant-badges">
+                  <span class="badge" [class]="teacherStatusClass(teacher.status)">
+                    {{ teacherStatusLabel(teacher.status) }}
+                  </span>
+                  <span class="badge badge-info" *ngIf="isCourseAuthor(teacher.id)">Autor del curso</span>
+                  <span class="badge" *ngIf="wasAddedByAdmin(teacher)">Agregado por administración</span>
+                </span>
+              </div>
+              <div class="participant-actions" *ngIf="!isStaff">
+                <button mat-stroked-button color="primary" class="profile-btn" (click)="sendMessageTo(teacher.id)">
+                  <mat-icon>chat</mat-icon> Enviar mensaje
+                </button>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="teachers.length === 0" class="participants-empty">Sin docentes asignados</p>
+        </section>
+
+        <section class="participants-section" aria-labelledby="students-title">
+          <h2 id="students-title">Estudiantes ({{ students.length }})</h2>
+          <div *ngIf="students.length > 0" class="participant-list">
+            <div class="participant-card" *ngFor="let student of students">
+              <div class="participant-avatar"><mat-icon>school</mat-icon></div>
+              <div class="participant-info">
+                <strong>{{ student.name }}</strong>
+                <span>{{ student.email }}<ng-container *ngIf="isTeacherOrAdmin"> · DNI {{ student.dni }}</ng-container></span>
+                <span class="enrolled-at" *ngIf="student.enrolledAt">Se unió: {{ student.enrolledAt | date:'short' }}</span>
+              </div>
+              <div class="participant-actions">
+                <button mat-stroked-button color="primary" class="profile-btn" *ngIf="isTeacherOrAdmin" (click)="openStudentProfile(student)">
+                  <mat-icon>person</mat-icon> Ver perfil
+                </button>
+                <button mat-stroked-button color="primary" class="profile-btn" *ngIf="!isStaff" (click)="sendMessageTo(student.id)">
+                  <mat-icon>chat</mat-icon> Enviar mensaje
+                </button>
+              </div>
+            </div>
+          </div>
+          <p *ngIf="students.length === 0" class="participants-empty">Sin estudiantes inscritos</p>
+        </section>
+
+        <section class="add-student-section" aria-labelledby="add-student-title" *ngIf="isTeacherOrAdmin">
+          <h3 id="add-student-title">Agregar estudiante</h3>
+          <p class="add-student-hint">Busca por DNI o correo institucional</p>
+          <div class="add-student-row">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>DNI o correo del estudiante</mat-label>
+              <input
+                matInput
+                [(ngModel)]="addStudentInput"
+                name="addStudent"
+                placeholder="Ej: 12345678 o rosa.quispe@ics.edu.pe"
+                (ngModelChange)="onStudentSearchInput()"
+              />
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+            <button mat-raised-button color="primary" [disabled]="!addStudentInput || searchingStudent" (click)="searchStudent()">
+              {{ searchingStudent ? 'Buscando...' : 'Buscar' }}
+            </button>
+          </div>
+
+          <div class="student-results" *ngIf="studentResults.length > 0">
+            <div class="participant-card" *ngFor="let user of studentResults">
+              <div class="participant-avatar"><mat-icon>person_add</mat-icon></div>
+              <div class="participant-info">
+                <strong>{{ user.names }} {{ user.lastNames }}</strong>
+                <span>{{ user.institutionalEmail }} · DNI {{ user.dni }}</span>
+              </div>
+              <button
+                mat-stroked-button
+                color="primary"
+                [disabled]="addingUserId === user._id || isStudentEnrolled(user._id)"
+                (click)="addStudent(user._id)"
+              >
+                {{ isStudentEnrolled(user._id) ? 'Inscrito' : (addingUserId === user._id ? 'Agregando...' : 'Agregar') }}
+              </button>
+            </div>
+          </div>
+          <p *ngIf="!searchingStudent && addStudentInput && studentResults.length === 0" class="participants-empty">
+            No se encontraron estudiantes con ese DNI o correo.
+          </p>
+        </section>
+
+        <nav class="course-actions" aria-label="Acciones del curso" *ngIf="isTeacherOrAdmin">
+          <button class="btn btn-primary" [routerLink]="['edit']">Editar</button>
+          <button class="btn btn-secondary" [routerLink]="['attendance']">Ver Asistencia</button>
+          <button class="btn btn-secondary" (click)="openGradebook()">
+            <mat-icon>grade</mat-icon> Registro de Notas
+          </button>
+        </nav>
+      </mat-tab>
+
+      <!-- Vista: Sesiones (semanas -> materiales + tareas) -->
+      <mat-tab label="Desarrollo del Curso">
+        <section class="sessions-tab" aria-labelledby="sessions-tab-title">
+          <!-- Sin semanas: solo botón Primera Semana -->
+          <div *ngIf="(!course.weeks || course.weeks.length === 0) && isTeacherOrAdmin" class="sessions-empty">
+            <mat-icon>calendar_today</mat-icon>
+            <p>Este curso aún no tiene semanas.</p>
+            <button mat-raised-button color="primary" (click)="createWeek()">
+              <mat-icon>add</mat-icon> Primera Semana
+            </button>
+          </div>
+          <div *ngIf="(!course.weeks || course.weeks.length === 0) && !isTeacherOrAdmin" class="sessions-empty">
+            <mat-icon>calendar_today</mat-icon>
+            <p>El docente aún no ha publicado semanas.</p>
+          </div>
+
+          <!-- Semanas existentes -->
+          <div *ngIf="course.weeks && course.weeks.length > 0" class="weeks-accordion">
+            <mat-expansion-panel *ngFor="let week of course.weeks; let wi = index" class="week-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="week-icon">calendar_view_week</mat-icon>
+                  <strong>Semana {{ week.number }}: {{ week.title }}</strong>
+                </mat-panel-title>
+                <mat-panel-description class="week-panel-desc">
+                  <span *ngIf="week.createdAt">Creada: {{ week.createdAt | date:'short' }}</span>
+                  <span *ngIf="sessionCountdowns[wi]" class="session-countdown">{{ sessionCountdowns[wi] }}</span>
+                </mat-panel-description>
+                <div class="week-flat-actions" *ngIf="isTeacherOrAdmin" (click)="$event.stopPropagation()">
+                  <button mat-icon-button color="primary" (click)="editWeek(wi)" aria-label="Editar semana">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteWeek(wi)" aria-label="Eliminar semana">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </mat-expansion-panel-header>
+
+              <!-- Sesión -->
+              <mat-expansion-panel class="week-sub-panel" [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon class="sub-panel-icon">event</mat-icon> Sesión
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openSessionCreate(wi); $event.stopPropagation()">
+                      <mat-icon>add</mat-icon> Agregar Sesión
+                    </button>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div *ngIf="getWeekSessionDate(wi)" class="session-date-block">
+                  <mat-icon class="material-icon">event</mat-icon>
+                  <span>Sesión programada: {{ getWeekSessionDate(wi) }}</span>
+                  <span class="session-countdown" *ngIf="sessionCountdowns[wi]">{{ sessionCountdowns[wi] }}</span>
+                </div>
+                <div *ngIf="getWeekSessionMaterial(wi)" class="material-item session-material">
+                  <mat-icon class="material-icon">event</mat-icon>
+                  <div class="material-info">
+                    <strong>{{ getWeekSessionMaterial(wi).title }}</strong>
+                    <span *ngIf="getWeekSessionDate(wi)">Sesión registrada: {{ getWeekSessionDate(wi) }}</span>
+                  </div>
+                  <button mat-stroked-button color="primary" class="material-download" *ngIf="getWeekSessionMaterial(wi).fileId" (click)="previewResource(getWeekSessionMaterial(wi))">
+                    <mat-icon>visibility</mat-icon> Ver
+                  </button>
+                  <button mat-stroked-button color="primary" class="material-download" *ngIf="getWeekSessionMaterial(wi).fileId" (click)="downloadResource(getWeekSessionMaterial(wi))">
+                    <mat-icon>download</mat-icon> Descargar
+                  </button>
+                  <button mat-icon-button color="primary" class="material-action" *ngIf="isTeacherOrAdmin" (click)="editSessionMaterial(wi)" aria-label="Editar sesión">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                </div>
+                <p class="materials-empty" *ngIf="!getWeekSessionMaterial(wi)">Sin sesión registrada</p>
+              </mat-expansion-panel>
+
+              <!-- Materiales -->
+              <mat-expansion-panel class="week-sub-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon class="sub-panel-icon">folder_open</mat-icon> Materiales ({{ week.materials?.length || 0 }})
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openMaterialCreate(wi); $event.stopPropagation()">
+                      <mat-icon>add</mat-icon> Nuevo Material
+                    </button>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div *ngIf="week.materials && week.materials.length > 0" class="materials-list">
+                  <div class="material-item" *ngFor="let mat of week.materials; let mi = index">
+                    <mat-icon class="material-icon">{{ getMaterialIcon(mat.type) }}</mat-icon>
+                    <div class="material-info">
+                      <strong>{{ mat.title }}</strong>
+                      <span *ngIf="mat.description">{{ mat.description }}</span>
+                    </div>
+                    <button mat-stroked-button color="primary" class="material-download" *ngIf="mat.fileId" (click)="previewResource(mat)">
+                      <mat-icon>visibility</mat-icon> Ver
+                    </button>
+                    <button mat-stroked-button color="primary" class="material-download" *ngIf="mat.fileId" (click)="downloadResource(mat)">
+                      <mat-icon>download</mat-icon> Descargar
+                    </button>
+                    <button mat-stroked-button color="primary" class="material-download" *ngIf="mat.url" (click)="openLink(mat.url, mat.title)">
+                          <mat-icon>open_in_new</mat-icon> Ver enlace
+                        </button>
+                    <button mat-icon-button color="primary" class="material-action" *ngIf="isTeacherOrAdmin" (click)="editMaterial(wi, mi)" aria-label="Editar material">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" class="material-action" *ngIf="isTeacherOrAdmin" (click)="deleteMaterial(wi, mi)" aria-label="Eliminar material">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <p *ngIf="!week.materials || week.materials.length === 0" class="materials-empty">Sin materiales en esta semana</p>
+              </mat-expansion-panel>
+
+              <!-- Tareas -->
+              <mat-expansion-panel class="week-sub-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon class="sub-panel-icon">assignment</mat-icon> Tareas ({{ getWeekTasks(week.number).length }})
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openTaskCreate(wi); $event.stopPropagation()">
+                      <mat-icon>add</mat-icon> Nueva Tarea
+                    </button>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div *ngIf="getWeekTasks(week.number).length > 0" class="session-tasks">
+                  <div class="session-task-item" *ngFor="let task of getWeekTasks(week.number)">
+                    <mat-icon class="material-icon">assignment</mat-icon>
+                    <div class="material-info">
+                      <strong>{{ task.title }}</strong>
+                      <span *ngIf="task.deadline">Vence: {{ task.deadline | date:'fullDate' }}</span>
+                      <span *ngIf="task.maxScore">Puntaje: {{ task.maxScore }}</span>
+                    </div>
+                    <a *ngIf="isTeacherOrAdmin" class="file-link" [routerLink]="['/courses', courseId, 'tasks', task._id]">Ver</a>
+                    <a *ngIf="!isTeacherOrAdmin" class="file-link" [routerLink]="['/my-tasks', task._id]">Ir</a>
+                    <button mat-icon-button color="warn" class="material-action" *ngIf="isTeacherOrAdmin"
+                            (click)="deleteTask(task._id)" aria-label="Eliminar tarea" matTooltip="Eliminar tarea">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <p *ngIf="getWeekTasks(week.number).length === 0" class="materials-empty">Sin tareas en esta semana</p>
+              </mat-expansion-panel>
+
+              <!-- Exámenes -->
+              <mat-expansion-panel class="week-sub-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon class="sub-panel-icon">quiz</mat-icon> Pasitos · Exámenes ({{ getWeekExams(week.number).length }})
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openExamCreate(week.number); $event.stopPropagation()">
+                      <mat-icon>add</mat-icon> Nuevo Examen
+                    </button>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div *ngIf="getWeekExams(week.number).length > 0" class="session-tasks">
+                  <div class="session-task-item" *ngFor="let exam of getWeekExams(week.number)">
+                    <mat-icon class="material-icon">quiz</mat-icon>
+                    <div class="material-info">
+                      <strong>{{ exam.title }}</strong>
+                      <span *ngIf="exam.description">{{ exam.description }}</span>
+                      <span>{{ exam.questions.length }} preguntas · {{ exam.duration }} min</span>
+                      <span *ngIf="!isTeacherOrAdmin && myExamAttempt(exam)" class="exam-attempt-info">
+                        Tu nota: {{ myExamAttempt(exam).score ?? 'por calificar' }}
+                      </span>
+                    </div>
+                    <button mat-stroked-button color="primary" class="material-download"
+                            *ngIf="!isTeacherOrAdmin && !myExamAttempt(exam)" (click)="openExamTake(exam)">
+                      <mat-icon>edit</mat-icon> Rendir
+                    </button>
+                    <button mat-stroked-button color="primary" class="material-download"
+                            *ngIf="!isTeacherOrAdmin && myExamAttempt(exam)" (click)="openExamTake(exam)" [disabled]="true">
+                      <mat-icon>done</mat-icon> Rindió
+                    </button>
+                    <button mat-stroked-button color="primary" class="material-download" *ngIf="isTeacherOrAdmin" (click)="openExamSupervision(exam)">
+                      <mat-icon>visibility</mat-icon> Supervisión
+                    </button>
+                    <button mat-icon-button color="primary" class="material-action" *ngIf="isTeacherOrAdmin" (click)="openExamEdit(exam)" aria-label="Editar examen" matTooltip="Editar examen">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" class="material-action" *ngIf="isTeacherOrAdmin"
+                            (click)="deleteExam(exam)" aria-label="Eliminar examen" matTooltip="Eliminar examen">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <p *ngIf="getWeekExams(week.number).length === 0" class="materials-empty">Sin exámenes en esta semana</p>
+              </mat-expansion-panel>
+
+              <!-- Foros -->
+              <mat-expansion-panel class="week-sub-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <mat-icon class="sub-panel-icon">forum</mat-icon> Foros ({{ getWeekForums(week.number).length }})
+                  </mat-panel-title>
+                  <mat-panel-description>
+                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openForumCreate(week.number); $event.stopPropagation()">
+                      <mat-icon>add</mat-icon> Nuevo Foro
+                    </button>
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                <div *ngIf="getWeekForums(week.number).length > 0" class="session-tasks">
+                  <div class="session-task-item" *ngFor="let forum of getWeekForums(week.number)">
+                    <mat-icon class="material-icon">forum</mat-icon>
+                    <div class="material-info">
+                      <strong>{{ forum.title }}</strong>
+                      <span *ngIf="forum.description">{{ forum.description }}</span>
+                      <span>{{ forum.posts.length }} publicaciones</span>
+                    </div>
+                    <span class="badge badge-info" *ngIf="forum.isEvaluated">Evaluado</span>
+                    <span class="badge badge-warning" *ngIf="forum.isLocked">Cerrado</span>
+                    <a class="file-link" [routerLink]="['/courses', courseId, 'forums', forum._id]">Ver</a>
+                    <button mat-icon-button color="warn" class="material-action" *ngIf="isTeacherOrAdmin"
+                            (click)="deleteForum(forum._id)" aria-label="Eliminar foro" matTooltip="Eliminar foro">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <p *ngIf="getWeekForums(week.number).length === 0" class="materials-empty">Sin foros en esta semana</p>
+              </mat-expansion-panel>
+            </mat-expansion-panel>
+          </div>
+        </section>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Botón flotante Crear Semana -->
+    <button mat-fab extended color="primary" class="fab-create-week" *ngIf="isTeacherOrAdmin && course.weeks && course.weeks.length > 0" (click)="createWeek()">
+      <mat-icon>add</mat-icon> Crear Semana
+    </button>
+  </div>
+</section>

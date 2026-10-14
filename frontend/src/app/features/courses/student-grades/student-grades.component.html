@@ -1,0 +1,58 @@
+<div class="student-grades">
+  <div class="loading-row" *ngIf="isLoading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando tus notas...</span>
+  </div>
+
+  <p class="empty-note" *ngIf="!isLoading && rows.length === 0">
+    Aún no tienes calificaciones registradas.
+  </p>
+
+  <div class="table-wrap" *ngIf="!isLoading && rows.length > 0">
+    <table class="grades-table" aria-label="Mis notas">
+      <thead>
+        <tr>
+          <th scope="col" *ngIf="showCourseColumn">Curso</th>
+          <th scope="col">Tipo</th>
+          <th scope="col">Título</th>
+          <th scope="col">Nota</th>
+          <th scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td class="course-name" *ngIf="showCourseColumn">
+            {{ row.courseName }}
+            <button mat-button class="course-link" *ngIf="row.courseId" (click)="goToCourse(row.courseId)">
+              <mat-icon>arrow_forward</mat-icon>
+              Ver curso
+            </button>
+          </td>
+          <td>
+            <span class="badge kind-badge" [class.kind-examen]="row.kind === 'examen'"
+                                          [class.kind-foro]="row.kind === 'foro'">
+              {{ row.kind }}
+            </span>
+          </td>
+          <td>{{ row.title }}</td>
+          <td class="score-cell">
+            <span *ngIf="row.score !== null">{{ row.score }}</span>
+            <span *ngIf="row.score === null">—</span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="row.isPublished"
+                                 [class.badge-warning]="!row.isPublished">
+              {{ row.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td [attr.colspan]="showCourseColumn ? 4 : 3">Promedio</td>
+          <td class="avg-cell">{{ averageLabel }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

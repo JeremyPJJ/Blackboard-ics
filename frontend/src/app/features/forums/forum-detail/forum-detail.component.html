@@ -1,0 +1,164 @@
+<section class="forum-detail" aria-labelledby="forum-title">
+  <app-loading-message *ngIf="isLoading" message="Cargando foro..."></app-loading-message>
+
+  <div *ngIf="!isLoading && forum" class="forum-content">
+    <div class="back-row">
+      <app-back-button></app-back-button>
+    </div>
+
+    <header class="forum-header">
+      <div>
+        <h1 id="forum-title">{{ forum.title }}</h1>
+        <p class="forum-meta">Semana {{ forum.weekNumber }} · Sesión {{ forum.sessionNumber }}</p>
+        <p class="forum-desc" *ngIf="forum.description">{{ forum.description }}</p>
+      </div>
+      <div class="forum-header-actions">
+        <span class="badge badge-info" *ngIf="forum.isEvaluated">Evaluado</span>
+        <span class="badge badge-warning" *ngIf="forum.isLocked">Cerrado</span>
+        <span class="badge" *ngIf="forum.availableFrom">Habilita: {{ forum.availableFrom | date:'short' }}</span>
+        <button mat-stroked-button color="primary" *ngIf="can('foros.crear')" (click)="toggleLock()">
+          {{ forum.isLocked ? 'Abrir' : 'Cerrar' }} foro
+        </button>
+        <button mat-stroked-button color="primary" *ngIf="can('foros.crear')" (click)="openEdit()">
+          <mat-icon>edit</mat-icon> Editar
+        </button>
+      </div>
+    </header>
+
+    <!-- Nueva publicación -->
+    <div class="post-box" *ngIf="!forum.isLocked">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Escribe una publicación</mat-label>
+        <textarea matInput [(ngModel)]="newPost" name="newPost" rows="3" placeholder="Comparte tu opinión..."></textarea>
+      </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="!newPost.trim()" (click)="submitPost()">
+        Publicar
+      </button>
+    </div>
+    <p class="locked-note" *ngIf="forum.isLocked">Este foro está cerrado. Solo lectura.</p>
+
+    <!-- Panel de evaluación (solo docente y foro evaluado) -->
+    <div class="evaluation-panel" *ngIf="forum.isEvaluated && isTeacher">
+      <h2>Evaluación de participantes</h2>
+      <p class="eval-hint" *ngIf="participants.length === 0">Este foro aún no tiene estudiantes inscritos en el curso.</p>
+      <div class="eval-list" *ngIf="participants.length > 0">
+        <mat-expansion-panel *ngFor="let p of participants" class="eval-participant-panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="eval-avatar">person</mat-icon>
+              <span class="eval-name">{{ p.name }}</span>
+            </mat-panel-title>
+            <mat-panel-description class="eval-desc">
+              <span class="eval-posts-count">{{ postsByStudent(p.id).length }} intervenciones</span>
+              <span class="eval-score-badge" *ngIf="getScoreFor(p.id) > 0">Nota: {{ getScoreFor(p.id) }}</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <!-- Intervenciones del estudiante -->
+          <div class="student-interventions" *ngIf="postsByStudent(p.id).length > 0">
+            <div class="intervention" *ngFor="let item of postsByStudent(p.id)">
+              <span class="intervention-type" [class.is-reply]="item.type === 'reply'">
+                {{ item.type === 'post' ? 'Publicación' : 'Respuesta' }}
+              </span>
+              <span class="intervention-date">{{ item.date | date:'short' }}</span>
+              <p class="intervention-text">{{ item.text }}</p>
+            </div>
+          </div>
+          <p class="no-interventions" *ngIf="postsByStudent(p.id).length === 0">Este estudiante aún no ha participado en el foro.</p>
+
+          <div class="eval-row">
+            <mat-form-field appearance="outline" class="eval-score">
+              <mat-label>Nota (0-20)</mat-label>
+              <input matInput type="number" min="0" max="20" [(ngModel)]="scoreInputs[p.id]" name="score{{p.id}}" />
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="eval-btn" (click)="saveEvaluation(p.id)">
+              Guardar nota
+            </button>
+          </div>
+        </mat-expansion-panel>
+      </div>
+    </div>
+
+    <!-- Publicaciones -->
+    <div class="posts-list" *ngIf="forum.posts.length > 0">
+      <mat-expansion-panel *ngFor="let post of forum.posts; let pi = index" class="post-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="post-title-content">
+              <strong>{{ authorName(post.authorId) }}</strong>
+              <span class="post-excerpt">{{ post.content | slice:0:80 }}{{ post.content.length > 80 ? '…' : '' }}</span>
+            </span>
+          </mat-panel-title>
+          <mat-panel-description class="post-panel-desc">
+            <span class="badge badge-info" *ngIf="isAuthor(post.authorId)">Tú</span>
+            <span class="post-date">{{ post.createdAt | date:'short' }}</span>
+            <span class="replies-count">{{ post.replies?.length || 0 }} respuestas</span>
+            <span class="react-count" [class.reacted]="hasReacted(post)">
+              <mat-icon>thumb_up</mat-icon> {{ post.reactions?.length || 0 }}
+            </span>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="post-content-full">{{ post.content }}</div>
+
+        <div class="post-actions">
+          <button mat-button color="primary" class="react-btn" (click)="toggleReact(pi)" [class.reacted]="hasReacted(post)">
+            <mat-icon>thumb_up</mat-icon> {{ post.reactions?.length || 0 }}
+          </button>
+          <button mat-icon-button color="warn" class="post-delete" *ngIf="can('foros.crear')"
+                  (click)="removePost(pi)" matTooltip="Eliminar publicación" aria-label="Eliminar publicación">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+
+        <!-- Respuestas -->
+        <div class="replies-list" *ngIf="post.replies && post.replies.length > 0">
+          <div class="reply-card" *ngFor="let reply of post.replies; let ri = index">
+            <div class="reply-avatar"><mat-icon>person</mat-icon></div>
+            <div class="reply-body">
+              <div class="reply-author">
+                <strong>{{ authorName(reply.authorId) }}</strong>
+                <span class="post-date">{{ reply.createdAt | date:'short' }}</span>
+                <button mat-icon-button color="warn" class="reply-delete" *ngIf="can('foros.crear')"
+                        (click)="removeReply(pi, ri)" matTooltip="Eliminar respuesta" aria-label="Eliminar respuesta">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <p>{{ reply.content }}</p>
+
+              <!-- Respuestas anidadas -->
+              <div class="nested-replies" *ngIf="reply.replies && reply.replies.length > 0">
+                <div class="nested-reply" *ngFor="let nested of reply.replies">
+                  <strong>{{ authorName(nested.authorId) }}</strong>
+                  <span class="post-date">{{ nested.createdAt | date:'short' }}</span>
+                  <p>{{ nested.content }}</p>
+                </div>
+              </div>
+
+              <div class="nested-reply-box" *ngIf="!forum.isLocked">
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput [(ngModel)]="replyToReplyTexts[pi + '-' + ri]" [name]="'rtr' + pi + '_' + ri" placeholder="Responder a esta respuesta..." />
+                </mat-form-field>
+                <button mat-button color="primary" [disabled]="!(replyToReplyTexts[pi + '-' + ri] || '').trim()" (click)="submitReplyToReply(pi, ri)">
+                  Responder
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reply-box" *ngIf="!forum.isLocked">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Responder</mat-label>
+            <input matInput [(ngModel)]="replyTexts[pi]" name="reply{{pi}}" placeholder="Escribe una respuesta..." />
+          </mat-form-field>
+          <button mat-stroked-button color="primary" [disabled]="!(replyTexts[pi] || '').trim()" (click)="submitReply(pi)">
+            Responder
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </div>
+
+    <app-empty-state *ngIf="forum.posts.length === 0" message="Sé el primero en publicar"></app-empty-state>
+  </div>
+</section>

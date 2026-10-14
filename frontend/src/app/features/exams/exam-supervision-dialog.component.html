@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ data.title }} — Supervisión</h2>
+<mat-dialog-content>
+  <div class="loading-row" *ngIf="isLoading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando intentos...</span>
+  </div>
+
+  <div *ngIf="!isLoading && exam && exam.attempts.length === 0" class="empty-note">
+    <p>Aún no hay estudiantes que hayan rendido el examen.</p>
+  </div>
+
+  <div *ngIf="!isLoading && exam" class="attempts-list">
+    <mat-expansion-panel *ngFor="let attempt of exam.attempts" class="attempt-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon class="ap-icon">person</mat-icon>
+          <span>{{ studentName(attempt.studentId) }}</span>
+        </mat-panel-title>
+        <mat-panel-description>
+          <span class="attempt-status" [class.warn]="attempt.supervisionEvents?.length > 0">
+            {{ attempt.supervisionEvents?.length || 0 }} incidencias
+          </span>
+          <span class="attempt-score">Nota: {{ attemptScore(attempt) }}</span>
+          <button mat-icon-button color="warn" class="attempt-delete"
+                  (click)="removeAttempt(attempt); $event.stopPropagation()"
+                  matTooltip="Eliminar intento de este estudiante" aria-label="Eliminar intento">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="attempt-info">
+        <p><strong>Inicio:</strong> {{ attempt.startedAt | date:'short' }}</p>
+        <p *ngIf="attempt.finishedAt"><strong>Fin:</strong> {{ attempt.finishedAt | date:'short' }}</p>
+        <p><strong>Estado:</strong> {{ attempt.status }}</p>
+      </div>
+
+      <h4 class="events-title">Eventos de supervisión</h4>
+      <div *ngIf="attempt.supervisionEvents && attempt.supervisionEvents.length > 0" class="events-list">
+        <div class="event-item" *ngFor="let ev of attempt.supervisionEvents">
+          <mat-icon class="event-icon" [class.warn]="ev.type !== 'focus_lost'">warning</mat-icon>
+          <span class="event-label">{{ eventLabel(ev.type) }}</span>
+          <span class="event-time">{{ ev.timestamp | date:'short' }}</span>
+        </div>
+      </div>
+      <p class="no-events" *ngIf="!attempt.supervisionEvents || attempt.supervisionEvents.length === 0">
+        Sin eventos de supervisión.
+      </p>
+    </mat-expansion-panel>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

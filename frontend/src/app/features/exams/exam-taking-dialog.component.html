@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>
+  {{ exam.title }}
+  <span class="timer" [class.timer-warn]="remainingSeconds < 300">⏱ {{ timeLabel }}</span>
+</h2>
+<mat-dialog-content>
+  <div class="supervision-banner">
+    <mat-icon>visibility</mat-icon>
+    <span>{{ exam.supervisionMessage || 'Estás siendo supervisado. No cambies de pestaña ni salgas de pantalla completa.' }}</span>
+  </div>
+  <p class="incidents" *ngIf="supervisionCount > 0">
+    Incidencias registradas: {{ supervisionCount }}
+  </p>
+
+  <div class="question" *ngFor="let q of exam.questions; let qi = index">
+    <p class="q-text">{{ qi + 1 }}. {{ q.text }} <span class="q-points">({{ q.points }} pts)</span></p>
+
+    <mat-radio-group *ngIf="q.type === 'opcion_multiple' || q.type === 'verdadero_falso'"
+                     (change)="selectOption(qi, $event.value)">
+      <mat-radio-button *ngFor="let o of q.options" [value]="o.text" class="option-radio">
+        {{ o.text }}
+      </mat-radio-button>
+    </mat-radio-group>
+
+    <mat-form-field appearance="outline" class="full-width" *ngIf="q.type === 'completar'">
+      <mat-label>Tu respuesta</mat-label>
+      <input matInput [(ngModel)]="answers[qi]" name="answer{{qi}}" placeholder="Escribe la respuesta..." />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width" *ngIf="q.type === 'desarrollo'">
+      <mat-label>Tu desarrollo</mat-label>
+      <textarea matInput [(ngModel)]="answers[qi]" name="dev{{qi}}" rows="4"></textarea>
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" [disabled]="!complete() || submitted" (click)="submit()">
+    {{ submitted ? 'Enviando...' : 'Entregar examen' }}
+  </button>
+</mat-dialog-actions>

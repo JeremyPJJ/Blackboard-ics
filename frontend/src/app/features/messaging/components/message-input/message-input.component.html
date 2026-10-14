@@ -1,0 +1,23 @@
+<div class="message-input">
+  <mat-form-field appearance="outline" class="input-field">
+    <mat-label>Escribe un mensaje...</mat-label>
+    <input
+      matInput
+      [(ngModel)]="message"
+      (keyup.enter)="send()"
+      [disabled]="!store.connected() || !store.selectedConversationId()"
+      autocomplete="off"
+    />
+  </mat-form-field>
+  <button
+    mat-fab
+    color="primary"
+    class="send-button"
+    (click)="send()"
+    [disabled]="!message.trim() || !store.connected() || !store.selectedConversationId()"
+    matTooltip="Enviar mensaje"
+    aria-label="Enviar mensaje"
+  >
+    <mat-icon>send</mat-icon>
+  </button>
+</div>

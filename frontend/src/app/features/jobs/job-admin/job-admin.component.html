@@ -1,0 +1,318 @@
+<div class="admin-page">
+  <div class="admin-header">
+    <h1>Gestión de ofertas laborales</h1>
+    <button *ngIf="canSeeJobs" mat-button (click)="loadJobs()">
+      <mat-icon>refresh</mat-icon>
+      Recargar
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div *ngIf="store.error()" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ store.error() }}</span>
+  </div>
+
+  <mat-tab-group *ngIf="!loading()" animationDuration="200ms">
+    <!-- ================= TAB: REGISTRAR (ofertas.crear) ================= -->
+    <mat-tab label="Registrar" *ngIf="canManage">
+      <div class="tab-body">
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>
+              {{ editingId() ? 'Editar oferta' : 'Nueva oferta' }}
+            </mat-card-title>
+            <mat-card-subtitle *ngIf="editingId()">
+              Editando la oferta seleccionada — los cambios se guardan al enviar.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form (ngSubmit)="save()" #jobForm="ngForm">
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Empresa *</mat-label>
+                  <input matInput [(ngModel)]="company" name="company" required />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Cargo / posición *</mat-label>
+                  <input matInput [(ngModel)]="position" name="position" required />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="span-2">
+                  <mat-label>Descripción</mat-label>
+                  <textarea
+                    matInput
+                    rows="4"
+                    [(ngModel)]="description"
+                    name="description"
+                  ></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="span-2">
+                  <mat-label>Requisitos (uno por línea)</mat-label>
+                  <textarea
+                    matInput
+                    rows="4"
+                    [(ngModel)]="requirementsText"
+                    name="requirements"
+                  ></textarea>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Carrera</mat-label>
+                  <input matInput [(ngModel)]="career" name="career" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Modalidad</mat-label>
+                  <mat-select [(ngModel)]="modality" name="modality">
+                    <mat-option value="">Sin especificar</mat-option>
+                    <mat-option *ngFor="let m of modalities" [value]="m">
+                      {{ m | titlecase }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Salario</mat-label>
+                  <input matInput [(ngModel)]="salary" name="salary" placeholder="S/ 1,500" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha de cierre *</mat-label>
+                  <input matInput type="date" [(ngModel)]="deadline" name="deadline" required />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Email de contacto</mat-label>
+                  <input matInput [(ngModel)]="contactEmail" name="contactEmail" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Teléfono de contacto</mat-label>
+                  <input matInput [(ngModel)]="contactPhone" name="contactPhone" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="span-2">
+                  <mat-label>Ubicación</mat-label>
+                  <input matInput [(ngModel)]="location" name="location" />
+                </mat-form-field>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  *ngIf="editingId()"
+                  mat-stroked-button
+                  type="button"
+                  (click)="startCreate()"
+                >
+                  Cancelar edición
+                </button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="formSubmitting()"
+                >
+                  <mat-icon *ngIf="!formSubmitting()">
+                    {{ editingId() ? 'save' : 'add' }}
+                  </mat-icon>
+                  {{ formSubmitting()
+                    ? 'Guardando…'
+                    : editingId() ? 'Guardar cambios' : 'Crear oferta' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- ========== TAB: VER POSTULACIONES (ofertas.ver | ofertas.revisar) ========== -->
+    <mat-tab label="Ver postulaciones" *ngIf="canSeeJobs || canReview">
+      <div class="tab-body">
+        <div class="filters-row">
+          <mat-form-field appearance="outline" class="offer-select">
+            <mat-label>Selecciona una oferta</mat-label>
+            <mat-select [(ngModel)]="selectedOfferId" name="selectedOffer">
+              <mat-option *ngFor="let job of jobs()" [value]="job._id">
+                {{ job.position }} — {{ job.company }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="offer-select">
+            <mat-label>Filtrar por estado</mat-label>
+            <mat-select [(ngModel)]="statusFilter" name="statusFilter">
+              <mat-option value="">Todos</mat-option>
+              <mat-option *ngFor="let s of statusOptions" [value]="s">
+                {{ applicationLabels[s] }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <ng-container *ngIf="selectedOffer() as offer">
+          <mat-card class="applications-card">
+            <mat-card-header>
+              <mat-card-title>
+                Postulaciones — {{ offer.position }} ({{ offer.company }})
+              </mat-card-title>
+              <mat-card-subtitle>
+                {{ offer.applications?.length ?? 0 }} postulación{{
+                  (offer.applications?.length ?? 0) !== 1 ? 'es' : ''
+                }}
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div
+                *ngIf="filteredApplications().length === 0"
+                class="empty-row"
+              >
+                {{
+                  statusFilter()
+                    ? 'No hay postulaciones con ese estado.'
+                    : 'Todavía no hay postulaciones para esta oferta.'
+                }}
+              </div>
+
+              <div
+                *ngFor="let entry of filteredApplications()"
+                class="application-row"
+              >
+                <div class="application-info">
+                  <div class="application-student">
+                    <mat-icon>person</mat-icon>
+                    <strong>{{ studentName(entry.app.studentId) }}</strong>
+                  </div>
+                  <div class="application-meta">
+                    Postuló el {{ entry.app.appliedAt | date: 'dd/MM/yyyy HH:mm' }}
+                  </div>
+                  <div *ngIf="entry.app.coverLetter" class="application-letter">
+                    {{ entry.app.coverLetter }}
+                  </div>
+                  <div
+                    *ngIf="entry.app.attachments && entry.app.attachments.length > 0"
+                    class="application-attachments"
+                  >
+                    <span class="attachments-label">
+                      <mat-icon>attach_file</mat-icon> Adjuntos:
+                    </span>
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      class="file-link"
+                      *ngFor="let fileId of entry.app.attachments; let fi = index"
+                      (click)="downloadAttachment(fileId, fi)"
+                    >
+                      <mat-icon>download</mat-icon>
+                      Descargar CV{{ entry.app.attachments.length > 1 ? ' ' + (fi + 1) : '' }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="application-status">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Estado</mat-label>
+                    <mat-select
+                      [value]="entry.app.status"
+                      [disabled]="changingStatus() !== null"
+                      (selectionChange)="changeStatus(entry.index, $event.value)"
+                    >
+                      <mat-option *ngFor="let s of statusOptions" [value]="s">
+                        {{ applicationLabels[s] }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-progress-spinner
+                    *ngIf="changingStatus() === entry.index"
+                    diameter="18"
+                    mode="indeterminate"
+                  ></mat-progress-spinner>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </ng-container>
+      </div>
+    </mat-tab>
+
+    <!-- ================= TAB: VER OFERTAS (ofertas.ver) ================= -->
+    <mat-tab label="Ver ofertas" *ngIf="canSeeJobs">
+      <div class="tab-body">
+        <mat-card class="table-card">
+          <mat-card-header>
+            <mat-card-title>Ofertas registradas</mat-card-title>
+            <mat-card-subtitle>
+              {{ jobs().length }} oferta{{ jobs().length !== 1 ? 's' : '' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div *ngIf="jobs().length === 0" class="empty-row">
+              Aún no hay ofertas registradas.
+            </div>
+
+            <table *ngIf="jobs().length > 0" class="jobs-table">
+              <thead>
+                <tr>
+                  <th>Cargo</th>
+                  <th>Empresa</th>
+                  <th>Carrera</th>
+                  <th>Estado</th>
+                  <th>Cierre</th>
+                  <th class="col-actions">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let job of jobs()">
+                  <td class="cell-strong">{{ job.position }}</td>
+                  <td>{{ job.company }}</td>
+                  <td>{{ job.career || '—' }}</td>
+                  <td>
+                    <span
+                      class="status-chip"
+                      [class.status-chip--active]="job.status === 'activa'"
+                      [class.status-chip--inactive]="job.status !== 'activa'"
+                    >
+                      {{ statusLabels[job.status] }}
+                    </span>
+                  </td>
+                  <td>{{ job.deadline | date: 'dd/MM/yyyy' }}</td>
+                  <td class="col-actions">
+                    <button
+                      mat-icon-button
+                      matTooltip="Editar"
+                      (click)="startEdit(job)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      matTooltip="Cerrar oferta"
+                      [disabled]="job.status !== 'activa'"
+                      (click)="closeJob(job)"
+                    >
+                      <mat-icon>lock</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      matTooltip="Eliminar"
+                      (click)="deleteJob(job)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

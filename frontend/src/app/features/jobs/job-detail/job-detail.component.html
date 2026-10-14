@@ -1,0 +1,103 @@
+<div class="detail-page">
+  <button mat-button class="back-link" (click)="goBackToList()">
+    <mat-icon>arrow_back</mat-icon>
+    Volver a ofertas
+  </button>
+
+  <mat-progress-bar *ngIf="store.loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div *ngIf="store.error()" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ store.error() }}</span>
+    <button mat-button color="primary" (click)="goBackToList()">Volver al listado</button>
+  </div>
+
+  <ng-container *ngIf="!store.loading() && job()">
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title>{{ job()!.position }}</mat-card-title>
+        <mat-card-subtitle>{{ job()!.company }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="job-tags">
+          <span *ngIf="job()!.career" class="tag tag--career">{{ job()!.career }}</span>
+          <span *ngIf="job()!.modality" class="tag tag--modality">
+            {{ job()!.modality | titlecase }}
+          </span>
+          <span
+            class="tag"
+            [class.tag--status-active]="job()!.status === 'activa'"
+            [class.tag--status-inactive]="job()!.status !== 'activa'"
+          >
+            {{ statusLabels[job()!.status] }}
+          </span>
+        </div>
+
+        <div class="job-meta">
+          <span *ngIf="job()!.location" class="meta-item">
+            <mat-icon>place</mat-icon> {{ job()!.location }}
+          </span>
+          <span *ngIf="job()!.salary" class="meta-item">
+            <mat-icon>payments</mat-icon> {{ job()!.salary }}
+          </span>
+          <span class="meta-item">
+            <mat-icon>event</mat-icon>
+            Cierre de postulaciones: {{ job()!.deadline | date: 'dd/MM/yyyy' }}
+          </span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <section *ngIf="job()!.description" class="section">
+          <h3>Descripción</h3>
+          <p class="pre-line">{{ job()!.description }}</p>
+        </section>
+
+        <section *ngIf="getRequirements(job()!).length > 0" class="section">
+          <h3>Requisitos</h3>
+          <ul class="requirements">
+            <li *ngFor="let req of getRequirements(job()!)">{{ req }}</li>
+          </ul>
+        </section>
+
+        <section *ngIf="job()!.contactEmail || job()!.contactPhone" class="section">
+          <h3>Contacto</h3>
+          <p class="contact">
+            <span *ngIf="job()!.contactEmail">{{ job()!.contactEmail }}</span>
+            <span *ngIf="job()!.contactPhone">{{ job()!.contactPhone }}</span>
+          </p>
+        </section>
+      </mat-card-content>
+
+      <mat-card-actions align="end" class="detail-actions">
+        <ng-container *ngIf="canSubmitApplication()">
+          <button mat-raised-button color="primary" (click)="goToApply()">
+            <mat-icon>send</mat-icon>
+            Postular a esta oferta
+          </button>
+        </ng-container>
+
+        <div *ngIf="myApplication()" class="my-application">
+          <mat-icon>check_circle</mat-icon>
+          <div>
+            <strong>Tu postulación:</strong>
+            <span
+              class="app-status"
+              [class.app-status--finalista]="myApplication()!.status === 'finalista'"
+            >
+              {{ applicationLabels[myApplication()!.status] }}
+            </span>
+          </div>
+        </div>
+
+        <p
+          *ngIf="!myApplication() && !canSubmitApplication() && job()!.status === 'activa'"
+          class="deadline-note"
+        >
+          Esta oferta ya no acepta postulaciones (plazo vencido).
+        </p>
+      </mat-card-actions>
+    </mat-card>
+  </ng-container>
+</div>

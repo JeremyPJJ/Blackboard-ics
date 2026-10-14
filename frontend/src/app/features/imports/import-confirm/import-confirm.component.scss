@@ -1,0 +1,99 @@
+.import-card {
+  max-width: 960px;
+  margin: 24px auto;
+}
+
+.import-ok {
+  color: #2e7d32;
+  background: rgba(76, 175, 80, 0.12);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.import-summary-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 16px;
+}
+
+.import-chip {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.import-chip-total {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.import-chip-valid {
+  background: rgba(76, 175, 80, 0.18);
+  color: #2e7d32;
+}
+
+.import-chip-duplicate {
+  background: rgba(255, 193, 7, 0.22);
+  color: #8a6d00;
+}
+
+.import-chip-error {
+  background: rgba(244, 67, 54, 0.16);
+  color: #c62828;
+}
+
+.import-section-title {
+  margin-top: 24px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.import-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+
+  th,
+  td {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+  }
+}
+
+.import-status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.import-status-success {
+  background: rgba(76, 175, 80, 0.18);
+  color: #2e7d32;
+}
+
+.import-status-duplicate {
+  background: rgba(255, 193, 7, 0.22);
+  color: #8a6d00;
+}
+
+.import-status-error {
+  background: rgba(244, 67, 54, 0.16);
+  color: #c62828;
+}
+
+.import-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}

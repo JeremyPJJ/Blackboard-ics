@@ -1,0 +1,127 @@
+<section class="course-list-container" aria-labelledby="course-list-title">
+  <header class="page-header">
+    <div class="page-header-left">
+      <app-back-button></app-back-button>
+      <div>
+        <h1 id="course-list-title">Gestión de Cursos</h1>
+        <p class="page-subtitle">Administra los cursos de la institución</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" routerLink="/courses/new" *ngIf="can('cursos.crear')">
+      <mat-icon>add</mat-icon> Nuevo Curso
+    </button>
+  </header>
+
+  <div class="filters-card">
+    <div class="filters">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar curso</mat-label>
+        <input matInput [(ngModel)]="searchTerm" name="search" placeholder="Nombre, código o carrera..." (ngModelChange)="loadCourses()">
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="searchTerm" matSuffix mat-icon-button type="button" (click)="searchTerm = ''; loadCourses()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Carrera</mat-label>
+        <mat-select [(ngModel)]="selectedCareer" name="careerFilter" (ngModelChange)="loadCourses()">
+          <mat-option value="">Todas</mat-option>
+          <mat-option value="Empleabilidad">Empleabilidad</mat-option>
+          <mat-option value="Técnica">Técnica</mat-option>
+          <mat-option value="Laboratorio">Laboratorio</mat-option>
+          <mat-option value="Enfermería">Enfermería</mat-option>
+          <mat-option value="Farmacia">Farmacia</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" name="statusFilter" (ngModelChange)="loadCourses()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="activo">Activo</mat-option>
+          <mat-option value="finalizado">Finalizado</mat-option>
+          <mat-option value="caducado">Caducado</mat-option>
+          <mat-option value="archivado">Archivado</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Año</mat-label>
+        <mat-select [(ngModel)]="selectedYear" name="yearFilter" (ngModelChange)="loadCourses()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let y of years" [value]="y">{{ y }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Semestre</mat-label>
+        <mat-select [(ngModel)]="selectedSemester" name="semesterFilter" (ngModelChange)="loadCourses()">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="1">Semestre I</mat-option>
+          <mat-option value="2">Semestre II</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <app-loading-message *ngIf="isLoading" message="Cargando cursos..."></app-loading-message>
+
+  <app-empty-state *ngIf="!isLoading && courses.length === 0" message="No se encontraron cursos">
+    <button class="btn btn-primary" routerLink="/courses/new">Crear primer curso</button>
+  </app-empty-state>
+
+  <ul class="course-grid" *ngIf="!isLoading && courses.length > 0" aria-label="Lista de cursos">
+    <li class="course-card" *ngFor="let course of courses">
+      <header class="course-header">
+        <h3>{{ course.name }}</h3>
+        <span class="badge" [class.badge-success]="course.status === 'activo'"
+                     [class.badge-warning]="course.status === 'finalizado'"
+                     [class.badge-danger]="course.status === 'archivado'">
+          {{ course.status }}
+        </span>
+      </header>
+
+      <dl class="course-info">
+        <dt>Código:</dt>
+        <dd>{{ course.code }}</dd>
+
+        <dt>Carrera:</dt>
+        <dd>{{ course.career }}</dd>
+
+        <dt>Docente:</dt>
+        <dd>{{ getTeacherName(course) }}</dd>
+
+        <dt>Año/Semestre:</dt>
+        <dd>{{ course.year || '—' }} {{ course.semester ? ('- ' + (course.semester === 1 ? 'I' : 'II')) : '' }}</dd>
+
+        <dt>Ciclo / Créditos:</dt>
+        <dd>{{ romanCycle(course.cycle) }} / {{ course.credits || '—' }}</dd>
+
+        <dt>Estudiantes:</dt>
+        <dd>{{ course.students.length }}</dd>
+
+        <dt>Invitación:</dt>
+        <dd>{{ course.invitationConfig?.code }}</dd>
+      </dl>
+
+      <nav class="course-actions" aria-label="Acciones del curso">
+        <button class="btn btn-primary" [routerLink]="['/courses', course._id]">
+          Ver Detalle
+        </button>
+        <button class="btn btn-secondary" [routerLink]="['/courses', course._id, 'edit']" *ngIf="can('cursos.editar') && course.status !== 'archivado'">
+          Editar
+        </button>
+        <button class="btn btn-danger" (click)="deleteCourse(course._id)" *ngIf="can('cursos.archivar') && course.status !== 'archivado'">
+          Archivar
+        </button>
+        <button class="btn btn-secondary" (click)="restoreCourse(course._id)" *ngIf="can('cursos.editar') && course.status === 'archivado'">
+          Restaurar
+        </button>
+        <button class="btn btn-danger" (click)="deleteCoursePermanent(course._id)" *ngIf="can('cursos.eliminar') && course.status === 'archivado'">
+          Eliminar
+        </button>
+      </nav>
+    </li>
+  </ul>
+</section>

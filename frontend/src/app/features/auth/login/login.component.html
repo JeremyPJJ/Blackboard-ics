@@ -1,0 +1,89 @@
+<div class="login-page">
+  <main class="login-main">
+    <div class="login-layout">
+      <!-- Panel institucional: al costado en desktop, arriba en mobile -->
+      <section class="login-brand" aria-label="Información institucional">
+        <img src="assets/logo.png" alt="IESTP Ciencias de la Salud" class="institutional-logo" />
+        <h1>IESTP Ciencias de la Salud</h1>
+        <p class="subtitle">Servicio de Desarrollo de Clases</p>
+        <p class="system-name">SIGA-ICS</p>
+      </section>
+
+      <!-- Panel del formulario -->
+      <section class="login-form-panel">
+        <h2 class="form-title">Iniciar Sesión</h2>
+        <p class="form-subtitle">Ingrese sus credenciales institucionales</p>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo Institucional</mat-label>
+            <input
+              matInput
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="usuario@ics.edu.pe"
+            />
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+              El correo es requerido
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+              Ingrese un correo válido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input
+              matInput
+              id="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="••••••••"
+            />
+            <mat-icon matPrefix>lock</mat-icon>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="'Mostrar contraseña'"
+              [attr.aria-pressed]="!hidePassword"
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              La contraseña es requerida
+            </mat-error>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('minlength')">
+              La contraseña debe tener al menos 6 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+            {{ errorMessage }}
+          </div>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            class="full-width"
+            [disabled]="loginForm.invalid || isLoading"
+          >
+            <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">Ingresar</span>
+            <span *ngIf="isLoading">Validando...</span>
+          </button>
+        </form>
+
+        <p class="login-footer">¿Olvidó su contraseña? Contacte al administrador del sistema</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="login-footer-section">
+    <p>© 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.</p>
+  </footer>
+</div>

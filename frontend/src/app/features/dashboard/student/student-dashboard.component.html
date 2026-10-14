@@ -1,0 +1,150 @@
+<section class="dashboard" aria-labelledby="student-dashboard-title">
+  <header class="dashboard-header">
+    <div>
+      <h1 id="student-dashboard-title">Resumen</h1>
+      <p class="dashboard-subtitle">
+        Estudiante de {{ userCareer || 'Ciencias de la Salud' }} · Resumen de tu actividad académica
+      </p>
+    </div>
+    <button class="btn btn-outline" (click)="showJoinDialog()">
+      <mat-icon>add</mat-icon> Unirse a un Curso
+    </button>
+  </header>
+
+  <section class="stats-grid" aria-label="Estadísticas del estudiante">
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Mis Cursos</h3>
+        <p class="stat-value">{{ myCourses.length }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card stat-link-card" (click)="goToMyTasks()">
+      <div class="stat-icon accent"><mat-icon>task_alt</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Tareas Pendientes</h3>
+        <p class="stat-value">{{ pendingTasks }}</p>
+        <span class="stat-link">Ver tareas →</span>
+      </div>
+    </article>
+
+    <article class="stat-card stat-link-card" (click)="openMyGrades()">
+      <div class="stat-icon accent"><mat-icon>grade</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Mis Notas</h3>
+        <p class="stat-value">Ver</p>
+        <span class="stat-link">Borrador — cuentan las del Q10 →</span>
+      </div>
+    </article>
+  </section>
+
+  <div class="notifications-banner" *ngIf="notifications.length > 0">
+    <div class="notification-item" *ngFor="let n of notifications">
+      <mat-icon>notifications</mat-icon>
+      <div class="notification-text">
+        <strong>{{ n.title }}</strong>
+        <span>{{ n.message }}</span>
+      </div>
+      <button mat-icon-button color="primary" (click)="dismissNotification(n._id)" aria-label="Cerrar notificación">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <section class="attendance-stats" aria-labelledby="attendance-stats-title">
+    <header class="section-header">
+      <h2 id="attendance-stats-title">Mi Asistencia</h2>
+    </header>
+    <div class="attendance-grid">
+      <div class="attendance-item present">
+        <mat-icon>check_circle</mat-icon>
+        <span class="att-count">{{ attendanceCounts.present }}</span>
+        <span class="att-label">Asistencias</span>
+      </div>
+      <div class="attendance-item absent">
+        <mat-icon>cancel</mat-icon>
+        <span class="att-count">{{ attendanceCounts.absent }}</span>
+        <span class="att-label">Faltas</span>
+      </div>
+      <div class="attendance-item late">
+        <mat-icon>schedule</mat-icon>
+        <span class="att-count">{{ attendanceCounts.late }}</span>
+        <span class="att-label">Tardanzas</span>
+      </div>
+      <div class="attendance-item justified">
+        <mat-icon>verified_user</mat-icon>
+        <span class="att-count">{{ attendanceCounts.justified }}</span>
+        <span class="att-label">Justificaciones</span>
+      </div>
+    </div>
+
+    <div class="attendance-per-course" *ngIf="courseAttendance.length > 0">
+      <h3>Por curso</h3>
+      <div class="course-att-row" *ngFor="let ca of courseAttendance">
+        <span class="course-att-name">{{ ca.courseName }}</span>
+        <span class="course-att-item ok">A: {{ ca.present }}</span>
+        <span class="course-att-item no">F: {{ ca.absent }}</span>
+        <span class="course-att-item warn">T: {{ ca.late }}</span>
+        <span class="course-att-item info">J: {{ ca.justified }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="enrolled-courses-title">
+    <header class="section-header">
+      <h2 id="enrolled-courses-title">Mis Cursos Inscritos</h2>
+    </header>
+
+    <app-skeleton *ngIf="isLoading" width="100%" height="100px"></app-skeleton>
+    <app-skeleton *ngIf="isLoading" width="100%" height="100px"></app-skeleton>
+
+    <ul class="course-list" *ngIf="!isLoading && myCourses.length > 0" aria-label="Lista de cursos inscritos">
+      <li class="course-card" *ngFor="let course of myCourses">
+        <div class="course-card-top">
+          <h4>{{ course.name }}</h4>
+          <span class="badge badge-success">{{ course.status }}</span>
+        </div>
+        <p class="course-code">{{ course.code }}</p>
+        <p class="course-teacher">Docente: {{ getTeacherName(course) }}</p>
+        <button class="btn btn-outline btn-block" [routerLink]="['/courses', course._id]">
+          Ir al Curso
+        </button>
+      </li>
+    </ul>
+
+    <app-empty-state *ngIf="!isLoading && myCourses.length === 0" message="No estás inscrito en ningún curso">
+      <button class="btn btn-primary" (click)="showJoinDialog()">Unirse a un Curso</button>
+    </app-empty-state>
+  </section>
+
+  <section class="join-course-section" *ngIf="showJoinForm" aria-labelledby="join-course-title">
+    <h3 id="join-course-title">Unirse a un Curso</h3>
+    <form (ngSubmit)="joinCourse()" class="join-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Código de Invitación</mat-label>
+        <input
+          matInput
+          id="courseCode"
+          type="text"
+          [(ngModel)]="invitationCode"
+          name="invitationCode"
+          placeholder="Ej: ENFER-ABC12"
+          aria-required="true"
+        />
+        <mat-icon matPrefix>vpn_key</mat-icon>
+      </mat-form-field>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!invitationCode">
+          Unirse al Curso
+        </button>
+        <button mat-stroked-button type="button" (click)="showJoinForm = false">
+          Cancelar
+        </button>
+      </div>
+      <div class="alert alert-danger" *ngIf="joinError" role="alert">
+        {{ joinError }}
+      </div>
+    </form>
+  </section>
+</section>

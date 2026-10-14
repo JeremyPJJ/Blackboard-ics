@@ -1,0 +1,126 @@
+<section class="meetings-section" aria-labelledby="meetings-title">
+  <div class="meetings-header">
+    <h2 id="meetings-title">Reuniones ({{ meetings.length }})</h2>
+    <div class="meetings-header-actions">
+      <a
+        *ngIf="openSessions.length === 0"
+        mat-stroked-button
+        color="primary"
+        [routerLink]="['/meetings', courseId, 'room']"
+      >
+        <mat-icon>videocam</mat-icon> Iniciar reunión virtual
+      </a>
+      <a
+        *ngIf="openSessions.length > 0"
+        class="en-marcha-badge"
+        [routerLink]="['/meetings', courseId, 'room']"
+        matTooltip="Unirse a la reunión en curso"
+      >
+        <span class="en-marcha-dot" aria-hidden="true"></span>
+        EN MARCHA — {{ openSessionTitle }}
+      </a>
+      <button mat-stroked-button color="primary" *ngIf="can('reuniones.crear')" (click)="openCreate()">
+        <mat-icon>add</mat-icon> Nueva Reunión
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-row" *ngIf="isLoading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando reuniones...</span>
+  </div>
+
+  <p class="meetings-empty" *ngIf="!isLoading && meetings.length === 0">
+    <mat-icon>event_busy</mat-icon>
+    <span>Sin reuniones programadas</span>
+  </p>
+
+  <div class="meeting-list" *ngIf="!isLoading && meetings.length > 0">
+    <div class="meeting-card" *ngFor="let meeting of meetings">
+      <div class="meeting-avatar"><mat-icon>videocam</mat-icon></div>
+      <div class="meeting-info">
+        <strong>{{ meeting.title }}</strong>
+        <span>{{ meetingDate(meeting) }} · Semana {{ meeting.weekNumber }}</span>
+        <span class="meeting-badges">
+          <span class="badge badge-info">{{ meetingTypeLabel(meeting) }}</span>
+          <span class="badge" *ngIf="meeting.platform">{{ platformLabel(meeting) }}</span>
+          <a *ngIf="meeting.externalLink" class="meeting-link" [href]="meeting.externalLink"
+             target="_blank" rel="noopener" matTooltip="Abrir enlace de la reunión">
+            <mat-icon>open_in_new</mat-icon> Unirse
+          </a>
+        </span>
+        <div class="meeting-participants" *ngIf="(meeting.participants || []).length > 0">
+          <span class="participants-label">Participantes:</span>
+          <span class="participant-chip" *ngFor="let userId of meeting.participants; let i = index">
+            {{ participantName(meeting, i) }}
+            <button mat-icon-button class="chip-remove" *ngIf="can('reuniones.editar')"
+                    (click)="removeParticipant(meeting, userId)" matTooltip="Quitar participante"
+                    aria-label="Quitar participante">
+              <mat-icon>close</mat-icon>
+            </button>
+          </span>
+        </div>
+      </div>
+      <div class="meeting-actions" *ngIf="can('reuniones.editar')">
+        <button mat-icon-button color="primary" (click)="openEdit(meeting)" aria-label="Editar reunión" matTooltip="Editar reunión">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="remove(meeting)" aria-label="Eliminar reunión" matTooltip="Eliminar reunión">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-section" aria-labelledby="history-title">
+    <h2 id="history-title">Resumen de reuniones ({{ history.length }})</h2>
+
+    <div class="loading-row" *ngIf="isHistoryLoading">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span>Cargando historial...</span>
+    </div>
+
+    <p class="meetings-empty" *ngIf="!isHistoryLoading && history.length === 0">
+      <mat-icon>history</mat-icon>
+      <span>Sin sesiones registradas</span>
+    </p>
+
+    <mat-accordion
+      *ngIf="!isHistoryLoading && historyGroups.length > 0"
+      class="history-panels"
+      displayMode="flat"
+    >
+      <mat-expansion-panel *ngFor="let group of historyGroups">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span class="panel-title-icon"><mat-icon>groups</mat-icon></span>
+            {{ group.title }}
+          </mat-panel-title>
+          <mat-panel-description>
+            {{ group.sessions.length }} {{ group.sessions.length === 1 ? 'sesión' : 'sesiones' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Participante</th>
+                <th scope="col">Duración</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of group.sessions">
+                <td>{{ historyDate(item) }}</td>
+                <td>{{ historyTime(item) }}</td>
+                <td>{{ item.displayName }}</td>
+                <td>{{ durationLabel(item) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</section>

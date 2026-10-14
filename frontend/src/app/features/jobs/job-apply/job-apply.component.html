@@ -1,0 +1,91 @@
+<div class="apply-page">
+  <button mat-button class="back-link" (click)="goBackToDetail()">
+    <mat-icon>arrow_back</mat-icon>
+    Volver al detalle
+  </button>
+
+  <mat-progress-bar *ngIf="store.loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div *ngIf="store.error()" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ store.error() }}</span>
+  </div>
+
+  <ng-container *ngIf="job()">
+    <mat-card class="apply-card">
+      <mat-card-header>
+        <mat-card-title>Postular a {{ job()!.position }}</mat-card-title>
+        <mat-card-subtitle>{{ job()!.company }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div *ngIf="store.confirmation()" class="confirmation">
+          <mat-icon>check_circle</mat-icon>
+          <div>
+            <p class="confirmation-text">{{ store.confirmation() }}</p>
+            <p class="confirmation-sub">
+              Estado actual de tu postulación:
+              <strong>{{ applicationLabels['postulado'] }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <form *ngIf="!store.confirmation()" (ngSubmit)="submit()" #applyForm="ngForm">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Carta de presentación</mat-label>
+            <textarea
+              matInput
+              rows="8"
+              placeholder="Cuéntanos por qué te interesa esta oferta y qué puedes aportar…"
+              [(ngModel)]="coverLetter"
+              name="coverLetter"
+              required
+              (blur)="coverLetterTouched = true"
+            ></textarea>
+            <mat-hint>
+              Tu postulación quedará registrada con estado "Postulado" y el
+              equipo podrá cambiarla a "En análisis", "Finalista", etc.
+            </mat-hint>
+            <mat-error *ngIf="coverLetterInvalid">
+              Escribe una carta de presentación para postular.
+            </mat-error>
+          </mat-form-field>
+
+          <div class="file-upload">
+            <input #cvFile type="file" id="cvFile" class="file-input"
+                   accept=".doc,.docx,.pdf,.jpg,.jpeg,.png"
+                   (change)="onFileSelected($event)" />
+            <label for="cvFile" class="btn btn-outline">
+              <mat-icon>attach_file</mat-icon>
+              {{ selectedFile ? selectedFile.name : 'Adjuntar CV (PDF, Word, imagen) — opcional' }}
+            </label>
+            <button *ngIf="selectedFile" mat-icon-button color="warn" type="button" (click)="clearFile()" aria-label="Quitar CV">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <p *ngIf="fileError" class="file-error">
+            <mat-icon>error_outline</mat-icon>
+            {{ fileError }}
+          </p>
+
+          <div class="form-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="submitting() || uploading"
+            >
+              <mat-icon *ngIf="!submitting() && !uploading">send</mat-icon>
+              <mat-progress-spinner
+                *ngIf="submitting() || uploading"
+                diameter="18"
+                mode="indeterminate"
+              ></mat-progress-spinner>
+              {{ uploading ? 'Subiendo CV…' : submitting() ? 'Enviando…' : 'Enviar postulación' }}
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>

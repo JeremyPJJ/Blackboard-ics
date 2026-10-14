@@ -1,0 +1,172 @@
+<section class="dashboard" aria-labelledby="dashboard-title">
+  <header class="dashboard-header">
+    <div>
+      <h1 id="dashboard-title">Resumen</h1>
+      <p class="dashboard-subtitle">{{ roleLabel }} · Resumen general de la institución</p>
+    </div>
+  </header>
+
+  <section class="stats-grid" aria-label="Estadísticas generales">
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Usuarios</h3>
+        <p class="stat-value">{{ totalUsers }}</p>
+        <a routerLink="/users" class="stat-link">Ver todos</a>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Cursos Activos</h3>
+        <p class="stat-value">{{ activeCourses }}</p>
+        <a routerLink="/courses" class="stat-link">Ver todos</a>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>person</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Docentes</h3>
+        <p class="stat-value">{{ totalTeachers }}</p>
+        <a routerLink="/users" class="stat-link">Ver todos</a>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>school</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Estudiantes</h3>
+        <p class="stat-value">{{ totalStudents }}</p>
+        <a routerLink="/users" class="stat-link">Ver todos</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="teacher-stats-title">
+    <header class="section-header">
+      <h2 id="teacher-stats-title">Docentes</h2>
+      <div class="view-toggle">
+        <button mat-stroked-button [class.active]="viewMode === 'cifras'" (click)="viewMode = 'cifras'">Cifras</button>
+        <button mat-stroked-button [class.active]="viewMode === 'graficos'" (click)="viewMode = 'graficos'">Gráficos</button>
+      </div>
+    </header>
+
+    <!-- Vista cifras -->
+    <div *ngIf="viewMode === 'cifras'" class="teacher-stats-grid">
+      <div class="teacher-stats-card" *ngFor="let t of visibleTeachers" (click)="openTeacherDetail(t)">
+        <div class="teacher-stats-avatar"><mat-icon>person</mat-icon></div>
+        <div class="teacher-stats-body">
+          <strong>{{ t.name }}</strong>
+          <div class="teacher-metrics">
+            <span class="metric" title="Cursos"><mat-icon>menu_book</mat-icon>{{ t.courseCount }}</span>
+            <span class="metric" title="Sesiones"><mat-icon>event</mat-icon>{{ t.sessionCount }}</span>
+            <span class="metric" title="Tareas"><mat-icon>assignment</mat-icon>{{ t.taskCount }}</span>
+            <span class="metric" title="Recursos"><mat-icon>folder_open</mat-icon>{{ t.materialCount }}</span>
+            <span class="metric" title="Foros"><mat-icon>forum</mat-icon>{{ t.forumCount }}</span>
+            <span class="metric" title="Exámenes"><mat-icon>quiz</mat-icon>{{ t.examCount }}</span>
+            <span class="metric" title="Reg. Asistencia"><mat-icon>fact_check</mat-icon>{{ t.attendanceCount }}</span>
+          </div>
+        </div>
+        <mat-icon class="chevron">chevron_right</mat-icon>
+      </div>
+      <button mat-button color="primary" class="see-more-btn" *ngIf="teacherStats.length > 0" (click)="showAllTeachers = !showAllTeachers">
+        {{ showAllTeachers ? 'Ver menos docentes' : 'Ver más docentes' }}
+      </button>
+    </div>
+
+    <!-- Leyenda de iconos -->
+    <div class="icon-legend" *ngIf="teacherStats.length > 0">
+      <span class="legend-item"><mat-icon>menu_book</mat-icon> Cursos</span>
+      <span class="legend-item"><mat-icon>event</mat-icon> Sesiones</span>
+      <span class="legend-item"><mat-icon>assignment</mat-icon> Tareas</span>
+      <span class="legend-item"><mat-icon>folder_open</mat-icon> Recursos</span>
+      <span class="legend-item"><mat-icon>forum</mat-icon> Foros</span>
+      <span class="legend-item"><mat-icon>quiz</mat-icon> Exámenes</span>
+      <span class="legend-item"><mat-icon>fact_check</mat-icon> Registros de asistencia</span>
+      <span class="legend-item"><mat-icon>chevron_right</mat-icon> Clic = ver detalle del docente</span>
+    </div>
+
+    <!-- Vista gráficos -->
+    <div *ngIf="viewMode === 'graficos'" class="teacher-charts">
+      <div class="chart-block" *ngFor="let t of visibleTeachers">
+        <div class="chart-teacher-name">{{ t.name }}</div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>menu_book</mat-icon> Cursos</span>
+          <div class="chart-bar"><div class="chart-fill" [style.width]="barWidth(t.courseCount)">{{ t.courseCount }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>event</mat-icon> Sesiones</span>
+          <div class="chart-bar"><div class="chart-fill" [style.width]="barWidth(t.sessionCount)">{{ t.sessionCount }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>assignment</mat-icon> Tareas</span>
+          <div class="chart-bar"><div class="chart-fill gold" [style.width]="barWidth(t.taskCount)">{{ t.taskCount }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>forum</mat-icon> Foros</span>
+          <div class="chart-bar"><div class="chart-fill purple" [style.width]="barWidth(t.forumCount || 0)">{{ t.forumCount || 0 }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>quiz</mat-icon> Exámenes</span>
+          <div class="chart-bar"><div class="chart-fill teal" [style.width]="barWidth(t.examCount || 0)">{{ t.examCount || 0 }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>folder_open</mat-icon> Recursos</span>
+          <div class="chart-bar"><div class="chart-fill blue" [style.width]="barWidth(t.materialCount)">{{ t.materialCount }}</div></div>
+        </div>
+        <div class="chart-row">
+          <span class="chart-label"><mat-icon>fact_check</mat-icon> Asistencia</span>
+          <div class="chart-bar"><div class="chart-fill green" [style.width]="barWidth(t.attendanceCount)">{{ t.attendanceCount }}</div></div>
+        </div>
+      </div>
+      <button mat-button color="primary" class="see-more-btn" *ngIf="teacherStats.length > 0" (click)="showAllTeachers = !showAllTeachers">
+        {{ showAllTeachers ? 'Ver menos docentes' : 'Ver más docentes' }}
+      </button>
+    </div>
+
+    <p *ngIf="teacherStats.length === 0" class="stats-empty">Sin docentes registrados.</p>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="quick-actions-title">
+    <header class="section-header">
+      <h2 id="quick-actions-title">Acciones Rápidas</h2>
+    </header>
+    <nav class="quick-actions" aria-label="Acciones rápidas">
+      <button class="btn btn-primary" routerLink="/users/new">
+        <mat-icon>person_add</mat-icon> Nuevo Usuario
+      </button>
+      <button class="btn btn-outline" routerLink="/courses/new">
+        <mat-icon>add_circle_outline</mat-icon> Nuevo Curso
+      </button>
+    </nav>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="recent-courses-title">
+    <header class="section-header">
+      <h2 id="recent-courses-title">Cursos Recientes</h2>
+      <a routerLink="/courses" class="stat-link">Ver todos</a>
+    </header>
+
+    <app-skeleton *ngIf="isLoading" width="100%" height="80px"></app-skeleton>
+    <app-skeleton *ngIf="isLoading" width="100%" height="80px"></app-skeleton>
+    <app-skeleton *ngIf="isLoading" width="100%" height="80px"></app-skeleton>
+
+    <ul class="course-list" *ngIf="!isLoading && courses.length > 0" aria-label="Lista de cursos recientes">
+      <li class="course-card clickable" *ngFor="let course of courses.slice(0, 5)" (click)="goToCourse(course._id)">
+        <div class="course-card-top">
+          <h4>{{ course.name }}</h4>
+          <span class="badge badge-success">{{ course.status }}</span>
+        </div>
+        <p class="course-code">{{ course.code }} · {{ course.career }}</p>
+        <p class="course-teacher">Docente: {{ getTeacherName(course) }}</p>
+        <span class="course-go">Abrir curso <mat-icon>chevron_right</mat-icon></span>
+      </li>
+    </ul>
+
+    <app-empty-state *ngIf="!isLoading && courses.length === 0" message="No hay cursos disponibles">
+      <button class="btn btn-primary" routerLink="/courses/new">Crear primer curso</button>
+    </app-empty-state>
+  </section>
+</section>

@@ -1,0 +1,104 @@
+.apply-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.back-link {
+  margin-bottom: 16px;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #fdecea;
+  color: #b3261e;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}
+
+.apply-card {
+  .confirmation {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px;
+    border-radius: 8px;
+    background: #e8f5e9;
+
+    mat-icon {
+      color: #2e7d32;
+      flex-shrink: 0;
+    }
+
+    .confirmation-text {
+      margin: 0 0 4px;
+      font-weight: 500;
+      color: #1b5e20;
+    }
+
+    .confirmation-sub {
+      margin: 0;
+      color: #2e7d32;
+      font-size: 0.9rem;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .file-upload {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1rem 0;
+
+    .file-input {
+      display: none;
+    }
+
+    label {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .file-error {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: -0.5rem 0 0.75rem;
+    font-size: 0.8125rem;
+    color: #b3261e;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+
+    mat-progress-spinner {
+      margin-right: 8px;
+    }
+  }
+}

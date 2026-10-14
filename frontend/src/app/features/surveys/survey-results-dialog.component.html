@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>{{ title }}</h2>
+<mat-dialog-content>
+  <div class="toggle-row">
+    <button mat-stroked-button [class.active]="view === 'summary'" (click)="view = 'summary'">Resumen</button>
+    <button mat-stroked-button [class.active]="view === 'users'" (click)="view = 'users'" [disabled]="anonymous">Por usuario</button>
+  </div>
+
+  <div *ngIf="view === 'summary'">
+    <p class="count">Total de respuestas: {{ stats?.totalResponses || 0 }}</p>
+    <div class="q-stats" *ngFor="let qs of stats?.questionStats || []">
+      <p class="q-text">{{ qs.questionIndex + 1 }}. {{ qs.questionText }}</p>
+      <div class="dist-row" *ngFor="let item of distribution(qs.answerDistribution)">
+        <span class="dist-key">{{ item.key }}</span>
+        <div class="dist-bar">
+          <div class="dist-fill" [style.width]="barWidth(item.value, stats.totalResponses)">
+            {{ item.value }} ({{ percent(item.value, stats.totalResponses) }}%)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="view === 'users'">
+    <div class="user-response" *ngFor="let r of responses">
+      <p class="user-name">{{ anonymous ? 'Anónimo' : (r.userName || 'Usuario') }}</p>
+      <p class="user-dni" *ngIf="!anonymous && r.userDni">DNI: {{ r.userDni }}</p>
+      <div class="user-answers" *ngFor="let q of questions; let qi = index">
+        <span class="q-label">{{ qi + 1 }}. {{ q.text }}</span>
+        <span class="a-value">{{ formatAnswer(r.answers[qi]) }}</span>
+      </div>
+    </div>
+    <p *ngIf="responses.length === 0">Aún no hay respuestas.</p>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

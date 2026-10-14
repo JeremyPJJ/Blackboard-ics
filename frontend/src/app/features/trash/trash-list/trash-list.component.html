@@ -1,0 +1,118 @@
+<div class="trash-page">
+  <div class="trash-header">
+    <div>
+      <h1 mat-dialog-title id="trash-dialog-title">Papelera</h1>
+      <p class="subtitle">
+        Elementos eliminados (soft-delete). Puedes restaurarlos dentro de los
+        30 días o eliminarlos definitivamente.
+      </p>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="loadEntries()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+
+  <div *ngIf="error()" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error() }}</span>
+    <button mat-button color="primary" (click)="loadEntries()">Reintentar</button>
+  </div>
+
+  <ng-container *ngIf="!loading() && !error()">
+    <div *ngIf="entries().length === 0" class="empty-state">
+      <mat-icon>delete_sweep</mat-icon>
+      <h2>La papelera está vacía</h2>
+      <p>Los usuarios y cursos eliminados aparecerán aquí durante 30 días.</p>
+    </div>
+
+    <div class="trash-table-wrap" *ngIf="entries().length > 0">
+      <table mat-table [dataSource]="entries()" class="trash-table">
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="type-chip" [class.type-chip--course]="entry.type === 'course'">
+              {{ typeLabels[entry.type] }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="entry-name">{{ entryName(entry) }}</span>
+            <span *ngIf="entry.reason" class="entry-reason">{{ entry.reason }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="deletedAt">
+          <th mat-header-cell *matHeaderCellDef>Eliminado</th>
+          <td mat-cell *matCellDef="let entry">
+            {{ entry.deletedAt | date: 'dd/MM/yyyy HH:mm' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="restoreUntil">
+          <th mat-header-cell *matHeaderCellDef>Restaurable hasta</th>
+          <td mat-cell *matCellDef="let entry">
+            <span
+              [class.expired]="isExpired(entry)"
+              [matTooltip]="isExpired(entry) ? 'Período de restauración vencido' : ''"
+            >
+              {{ entry.restoreUntil | date: 'dd/MM/yyyy' }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="state">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let entry">
+            <span *ngIf="entry.restoreError" class="restore-error">
+              <mat-icon>error_outline</mat-icon>
+              {{ entry.restoreError }}
+            </span>
+            <span *ngIf="isExpired(entry) && !entry.restoreError" class="expired-label">
+              <mat-icon>schedule</mat-icon>
+              Vencido
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let entry">
+            <div class="row-actions">
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="restore(entry)"
+                [disabled]="busyEntryId() === entry._id || isExpired(entry)"
+                [matTooltip]="isExpired(entry) ? 'El período de restauración ha expirado' : 'Restaurar elemento'"
+              >
+                <mat-icon>restore</mat-icon>
+                Restaurar
+              </button>
+              <button
+                mat-flat-button
+                class="danger-btn"
+                (click)="permanentlyDelete(entry)"
+                [disabled]="busyEntryId() === entry._id"
+                [matTooltip]="'Eliminar definitivamente (incluye el documento original)'"
+              >
+                <mat-icon>delete_forever</mat-icon>
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </ng-container>
+</div>

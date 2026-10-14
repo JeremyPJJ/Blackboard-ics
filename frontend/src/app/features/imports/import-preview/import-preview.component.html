@@ -1,0 +1,113 @@
+<mat-card class="import-card">
+  <mat-card-header>
+    <mat-card-title>Importar participantes</mat-card-title>
+    <mat-card-subtitle *ngIf="store.courseName()">{{ store.courseName() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p class="import-hint">
+      Sube un archivo <strong>.xlsx</strong> o <strong>.csv</strong> (máx. 5MB) con las columnas
+      <code>dni</code>, <code>names</code>, <code>lastNames</code> e
+      <code>institutionalEmail</code>. Los participantes se crearán (o actualizarán) y se
+      inscribirán en el curso.
+    </p>
+
+    <input
+      #fileInput
+      type="file"
+      accept=".xlsx,.csv"
+      class="import-file-input"
+      (change)="onFileSelected($event)"
+    />
+    <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
+      <mat-icon>upload_file</mat-icon>
+      {{ store.fileName() ? store.fileName() : 'Seleccionar archivo' }}
+    </button>
+
+    <mat-progress-bar
+      *ngIf="store.loading()"
+      mode="indeterminate"
+      class="import-progress"
+    ></mat-progress-bar>
+
+    <div *ngIf="store.error()" class="import-error">{{ store.error() }}</div>
+
+    <!-- Preview local (parseo con xlsx en el navegador) -->
+    <ng-container *ngIf="store.localRows().length > 0 && !store.hasServerSummary()">
+      <h3 class="import-section-title">Vista previa local del archivo</h3>
+      <table class="import-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>DNI</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Correo institucional</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of store.localRows()">
+            <td>{{ row.rowNumber }}</td>
+            <td>{{ row.dni }}</td>
+            <td>{{ row.names }}</td>
+            <td>{{ row.lastNames }}</td>
+            <td>{{ row.institutionalEmail }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+
+    <!-- Resumen autoritativo del backend -->
+    <ng-container *ngIf="store.hasServerSummary()">
+      <h3 class="import-section-title">Resumen de validación</h3>
+      <div class="import-summary-chips">
+        <span class="import-chip import-chip-total">Total: {{ store.total() }}</span>
+        <span class="import-chip import-chip-valid">Válidas: {{ store.validCount() }}</span>
+        <span class="import-chip import-chip-duplicate">Duplicadas: {{ store.duplicateCount() }}</span>
+        <span class="import-chip import-chip-error">Erróneas: {{ store.errorCount() }}</span>
+      </div>
+
+      <table class="import-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Estado</th>
+            <th>DNI</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Correo</th>
+            <th>Mensaje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of store.summary()!.preview">
+            <td>{{ row.rowNumber }}</td>
+            <td>
+              <span class="import-status" [ngClass]="'import-status-' + row.status">
+                {{ row.status }}
+              </span>
+            </td>
+            <td>{{ row.data?.dni ?? '—' }}</td>
+            <td>{{ row.data?.names ?? '—' }}</td>
+            <td>{{ row.data?.lastNames ?? '—' }}</td>
+            <td>{{ row.data?.institutionalEmail ?? '—' }}</td>
+            <td>{{ row.message }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="import-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          [disabled]="store.loading() || store.validCount() === 0"
+          (click)="confirm()"
+        >
+          <mat-icon>check_circle</mat-icon>
+          Confirmar importación
+        </button>
+      </div>
+    </ng-container>
+  </mat-card-content>
+</mat-card>

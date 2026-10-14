@@ -1,0 +1,85 @@
+<section class="dashboard" aria-labelledby="teacher-dashboard-title">
+  <header class="dashboard-header">
+    <div>
+      <h1 id="teacher-dashboard-title">Resumen</h1>
+      <p class="dashboard-subtitle">Docente · Resumen de tus cursos, estudiantes y actividades</p>
+    </div>
+    <button class="btn btn-primary" routerLink="/courses/new">
+      <mat-icon>add</mat-icon> Crear Curso
+    </button>
+  </header>
+
+  <section class="stats-grid" aria-label="Estadísticas del docente">
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>menu_book</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Mis Cursos</h3>
+        <p class="stat-value">{{ myCourses.length }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon accent"><mat-icon>task_alt</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Tareas por Revisar</h3>
+        <p class="stat-value">{{ pendingReviews }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>groups</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Estudiantes</h3>
+        <p class="stat-value">{{ totalStudents }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>forum</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Foros</h3>
+        <p class="stat-value">{{ totalForums }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card">
+      <div class="stat-icon"><mat-icon>quiz</mat-icon></div>
+      <div class="stat-body">
+        <h3 class="stat-label">Exámenes</h3>
+        <p class="stat-value">{{ totalExams }}</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-section" aria-labelledby="course-stats-title">
+    <header class="section-header">
+      <h2 id="course-stats-title">Resumen por Curso</h2>
+    </header>
+
+    <div *ngIf="courseStats.length > 0" class="course-stats-grid">
+      <div class="course-stat-card" *ngFor="let cs of courseStats">
+        <div class="course-stat-header">
+          <span class="course-stat-name" (click)="goToCourse(cs.courseId)">{{ cs.name }}</span>
+          <span class="badge" [class.badge-success]="cs.status === 'activo'" [class.badge-danger]="cs.status === 'archivado'">{{ cs.status }}</span>
+        </div>
+        <div class="course-stat-code" *ngIf="cs.invitationCode">
+          <mat-icon>vpn_key</mat-icon>
+          <span>{{ cs.invitationCode }}</span>
+          <button mat-icon-button color="primary" class="copy-btn" (click)="copyCode(cs.invitationCode)" matTooltip="Copiar código" aria-label="Copiar código">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+        </div>
+        <div class="course-stat-cells">
+          <span class="cell"><strong>{{ cs.sessionCount }}</strong> Sesiones</span>
+          <span class="cell"><strong>{{ cs.taskCount }}</strong> Tareas</span>
+          <span class="cell"><strong>{{ cs.forumCount || 0 }}</strong> Foros</span>
+          <span class="cell"><strong>{{ cs.examCount || 0 }}</strong> Exámenes</span>
+          <span class="cell"><strong>{{ cs.materialCount }}</strong> Recursos</span>
+          <span class="cell"><strong>{{ cs.attendanceCount }}</strong> Asistencia</span>
+          <span class="cell"><strong>{{ cs.studentCount }}</strong> Estudiantes</span>
+        </div>
+      </div>
+    </div>
+    <p *ngIf="courseStats.length === 0" class="stats-empty">Aún no tienes cursos con contenido.</p>
+  </section>
+</section>

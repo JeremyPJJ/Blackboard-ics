@@ -1,0 +1,165 @@
+<section class="form-container">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <button mat-icon-button (click)="goBack()" aria-label="Volver atrás">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <a routerLink="/dashboard">Dashboard</a>
+      <span class="separator">/</span>
+      <a routerLink="/users">Usuarios</a>
+      <span class="separator">/</span>
+      <span>{{ isEdit ? 'Editar' : 'Nuevo' }} Usuario</span>
+    </nav>
+
+    <h1>{{ isEdit ? 'Editar Usuario' : 'Nuevo Usuario' }}</h1>
+
+    <mat-card>
+      <mat-card-content>
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>DNI *</mat-label>
+              <input matInput formControlName="dni" maxlength="8" />
+              <mat-icon matPrefix>badge</mat-icon>
+              <mat-error *ngIf="userForm.get('dni')?.hasError('required')">DNI requerido</mat-error>
+              <mat-error *ngIf="userForm.get('dni')?.hasError('minlength') || userForm.get('dni')?.hasError('maxlength')">
+                DNI debe tener 8 dígitos
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nombres *</mat-label>
+              <input matInput formControlName="names" />
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="userForm.get('names')?.hasError('required')">Nombres requeridos</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Apellidos *</mat-label>
+              <input matInput formControlName="lastNames" />
+              <mat-icon matPrefix>person</mat-icon>
+              <mat-error *ngIf="userForm.get('lastNames')?.hasError('required')">Apellidos requeridos</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email Institucional *</mat-label>
+              <input matInput type="email" formControlName="institutionalEmail" />
+              <mat-icon matPrefix>email</mat-icon>
+              <mat-error *ngIf="userForm.get('institutionalEmail')?.hasError('required')">Email requerido</mat-error>
+              <mat-error *ngIf="userForm.get('institutionalEmail')?.hasError('email')">Email inválido</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Email Personal</mat-label>
+              <input matInput type="email" formControlName="personalEmail" />
+              <mat-icon matPrefix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput type="tel" formControlName="phone" />
+              <mat-icon matPrefix>phone</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de Nacimiento</mat-label>
+              <input matInput type="date" formControlName="birthDate" />
+              <mat-icon matPrefix>calendar_today</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Rol *</mat-label>
+              <mat-select formControlName="role">
+                <mat-option value="super_admin">Super Administrador</mat-option>
+                <mat-option value="unidad_academica">Unidad Académica</mat-option>
+                <mat-option value="secretaria">Secretaría</mat-option>
+                <mat-option value="soporte">Soporte</mat-option>
+                <mat-option value="docente">Docente</mat-option>
+                <mat-option value="estudiante">Estudiante</mat-option>
+              </mat-select>
+              <mat-icon matPrefix>security</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ isEdit ? 'Nueva contraseña (opcional)' : 'Contraseña' }} *</mat-label>
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              [placeholder]="isEdit ? 'Dejar vacío para no cambiar' : 'Mínimo 6 caracteres'"
+            />
+            <mat-icon matPrefix>lock</mat-icon>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="'Mostrar contraseña'"
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="userForm.get('password')?.hasError('required') && !isEdit">Contraseña requerida</mat-error>
+            <mat-error *ngIf="userForm.get('password')?.hasError('minlength')">Mínimo 6 caracteres</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Estado</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="activo">Activo</mat-option>
+              <mat-option value="inactivo">Inactivo</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="form-row" *ngIf="userForm.get('role')?.value === 'docente'">
+            <mat-form-field appearance="outline">
+              <mat-label>Año de contrato</mat-label>
+              <input matInput type="number" formControlName="contractYear" min="2000" max="2100" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Semestre de contrato</mat-label>
+              <mat-select formControlName="contractSemester">
+                <mat-option [value]="1">Semestre I</mat-option>
+                <mat-option [value]="2">Semestre II</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Permisos</mat-label>
+            <mat-select formControlName="permissions" multiple>
+              <mat-option *ngFor="let perm of availablePermissions" [value]="perm.key">
+                {{ perm.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>security</mat-icon>
+            <mat-hint>Designa qué puede ver y hacer este usuario</mat-hint>
+          </mat-form-field>
+
+          <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+            {{ errorMessage }}
+          </div>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid || isLoading">
+              <mat-spinner *ngIf="isLoading" diameter="20" class="inline-spinner"></mat-spinner>
+              <span *ngIf="!isLoading">{{ isEdit ? 'Actualizar' : 'Crear' }}</span>
+              <span *ngIf="isLoading">Guardando...</span>
+            </button>
+            <button mat-stroked-button type="button" (click)="goBack()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

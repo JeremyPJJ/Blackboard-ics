@@ -1,0 +1,88 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Reunión' : 'Nueva Reunión' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="meeting-form">
+    <p class="auto-week-hint">
+      Se programará en la Semana {{ data.weekNumber || 1 }} · Sesión {{ data.sessionNumber || 1 }}
+    </p>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Título</mat-label>
+      <input matInput formControlName="title" placeholder="Ej: Reunión de coordinación - Semana 1">
+      <mat-error *ngIf="form.get('title')?.hasError('required')">El título es obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción</mat-label>
+      <textarea matInput formControlName="description" rows="2"></textarea>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="scheduledDate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="form.get('scheduledDate')?.hasError('required')">La fecha es obligatoria</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Hora inicio</mat-label>
+        <input matInput type="time" formControlName="startTime">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Hora fin</mat-label>
+        <input matInput type="time" formControlName="endTime">
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="interna">Interna</mat-option>
+          <mat-option value="externa">Externa</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Plataforma</mat-label>
+        <mat-select formControlName="platform">
+          <mat-option value="zoom">Zoom</mat-option>
+          <mat-option value="meet">Google Meet</mat-option>
+          <mat-option value="teams">Microsoft Teams</mat-option>
+          <mat-option value="other">Otra</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('type')?.value === 'externa'">
+      <mat-label>Enlace externo</mat-label>
+      <input matInput formControlName="externalLink" placeholder="https://...">
+    </mat-form-field>
+
+    <div class="form-row" *ngIf="form.get('type')?.value === 'interna'">
+      <mat-form-field appearance="outline">
+        <mat-label>ID de reunión</mat-label>
+        <input matInput formControlName="meetingId">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input matInput formControlName="password">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Participantes</mat-label>
+      <mat-select formControlName="participants" multiple>
+        <mat-option *ngFor="let s of studentOptions" [value]="s.id">{{ s.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="form.invalid || saving" (click)="save()">
+    {{ saving ? 'Guardando...' : (isEdit ? 'Guardar cambios' : 'Crear reunión') }}
+  </button>
+</mat-dialog-actions>

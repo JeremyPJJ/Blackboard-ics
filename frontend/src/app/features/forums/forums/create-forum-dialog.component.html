@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Foro' : 'Nuevo Foro' }}</h2>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Título</mat-label>
+    <input matInput [(ngModel)]="title" name="title" placeholder="Ej: Debate - Semana 1" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <textarea matInput [(ngModel)]="description" name="description" rows="3" placeholder="Tema del debate..."></textarea>
+  </mat-form-field>
+
+  <div class="config-row" *ngIf="!data.weekNumber && !isEdit">
+    <mat-form-field appearance="outline">
+      <mat-label>Semana</mat-label>
+      <input matInput type="number" [(ngModel)]="weekNumber" name="week" min="1" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Sesión</mat-label>
+      <input matInput type="number" [(ngModel)]="sessionNumber" name="session" min="1" />
+    </mat-form-field>
+  </div>
+  <p class="week-hint" *ngIf="data.weekNumber && !isEdit">Se creará en la Semana {{ data.weekNumber }}</p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Fecha de habilitación</mat-label>
+    <input matInput [matDatepicker]="availP" [(ngModel)]="availableFrom" name="availableFrom" placeholder="¿Cuándo se habilita?" />
+    <mat-datepicker-toggle matSuffix [for]="availP"></mat-datepicker-toggle>
+    <mat-datepicker #availP></mat-datepicker>
+  </mat-form-field>
+
+  <div class="checks-row">
+    <mat-checkbox [(ngModel)]="isEvaluated" name="evaluated" color="primary">
+      Foro evaluado
+    </mat-checkbox>
+    <mat-checkbox [(ngModel)]="isLocked" name="locked" color="primary" *ngIf="isEdit">
+      Cerrado (solo lectura)
+    </mat-checkbox>
+  </div>
+  <p class="week-hint" *ngIf="!isEdit">Se creará en la Semana {{ weekNumber || 1 }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!title" (click)="save()">
+    {{ isEdit ? 'Guardar cambios' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

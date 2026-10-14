@@ -1,0 +1,87 @@
+<mat-toolbar class="app-toolbar" *ngIf="!isLoginPage">
+  <div class="toolbar-content">
+    <div class="logo-section" (click)="goToDashboard()" role="link" tabindex="0" (keydown.enter)="goToDashboard()">
+      <img src="assets/logo.png" alt="IESTP Ciencias de la Salud" class="toolbar-logo" />
+      <div class="toolbar-title">
+        <h1>SIGA-ICS</h1>
+        <p class="subtitle">Servicio de Desarrollo de Clases</p>
+      </div>
+    </div>
+    
+    <nav class="nav-menu" *ngIf="isAuthenticated">
+      <div class="nav-user-greeting">
+        <span class="greeting-role">{{ roleLabel }}</span>
+        <strong class="greeting-name">{{ userName }}</strong>
+      </div>
+      <button mat-button matTooltip="Dashboard" [routerLink]="['/dashboard', isAdmin ? 'admin' : 'teacher']" routerLinkActive="active">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+      <button mat-button matTooltip="Cursos" routerLink="/courses" routerLinkActive="active">
+        <mat-icon>school</mat-icon>
+        <span>Cursos</span>
+      </button>
+      <button mat-button matTooltip="Usuarios" routerLink="/users" routerLinkActive="active" *ngIf="isAdmin">
+        <mat-icon>people</mat-icon>
+        <span>Usuarios</span>
+      </button>
+      <button mat-button matTooltip="Encuestas" routerLink="/surveys" routerLinkActive="active">
+        <mat-icon>poll</mat-icon>
+        <span>Encuestas</span>
+        <span class="nav-badge" *ngIf="surveysStore.pendingSurveys() > 0">{{ surveysStore.pendingSurveys() }}</span>
+      </button>
+      <button mat-button matTooltip="Mensajería" routerLink="/messaging" routerLinkActive="active">
+        <mat-icon>chat</mat-icon>
+        <span>Mensajería</span>
+        <span class="nav-badge" *ngIf="messagingStore.totalUnread() > 0">{{ messagingStore.totalUnread() }}</span>
+      </button>
+      <button mat-button matTooltip="Ofertas laborales" routerLink="/jobs" routerLinkActive="active" *ngIf="canViewJobs && !canManageJobs">
+        <mat-icon>work</mat-icon>
+        <span>Ofertas</span>
+        <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
+      </button>
+      <button mat-button matTooltip="Gestionar ofertas" routerLink="/jobs/admin" routerLinkActive="active" *ngIf="canManageJobs">
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>{{ canViewJobs ? 'Gestionar Ofertas' : 'Registrar oferta' }}</span>
+        <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
+      </button>
+      <button mat-button matTooltip="Cerrar sesión" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </nav>
+  </div>
+</mat-toolbar>
+
+<button
+  mat-fab
+  color="primary"
+  class="profile-fab"
+  *ngIf="isAuthenticated && !isLoginPage"
+  (click)="openProfile()"
+  matTooltip="Mi perfil"
+  aria-label="Mi perfil"
+>
+  <mat-icon>account_circle</mat-icon>
+</button>
+
+<button
+  mat-fab
+  class="trash-fab"
+  *ngIf="isAdmin && !isLoginPage"
+  (click)="openTrash()"
+  matTooltip="Papelera"
+  aria-label="Papelera"
+>
+  <mat-icon>delete</mat-icon>
+</button>
+
+<main class="app-main" [class.login-main]="isLoginPage">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="app-footer" *ngIf="!isLoginPage">
+  <div class="footer-content">
+    <p>© 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.</p>
+  </div>
+</footer>

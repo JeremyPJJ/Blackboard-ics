@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Perfil del Estudiante</h2>
+<mat-dialog-content>
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <img *ngIf="data.student.photo" [src]="data.student.photo" alt="Foto del estudiante" />
+      <mat-icon *ngIf="!data.student.photo">person</mat-icon>
+    </div>
+    <div class="profile-name">
+      <h3>{{ data.student.name }}</h3>
+      <span>DNI: {{ data.student.dni }}</span>
+    </div>
+  </div>
+
+  <div class="profile-row">
+    <strong>Correo:</strong>
+    <span>{{ data.student.email }}</span>
+  </div>
+
+  <div class="profile-row">
+    <strong>Carrera:</strong>
+    <span>{{ getCareer() }}</span>
+  </div>
+
+  <div class="profile-courses">
+    <h4>Cursos que lleva ({{ data.courses.length }})</h4>
+    <ul *ngIf="data.courses.length > 0">
+      <li *ngFor="let course of data.courses">
+        {{ course.name }}
+        <span class="course-meta">{{ course.code }} · {{ course.career }}</span>
+      </li>
+    </ul>
+    <p *ngIf="data.courses.length === 0">Sin cursos inscritos.</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" *ngIf="!isStaff" (click)="sendMessageTo()">
+    <mat-icon>chat</mat-icon> Enviar mensaje
+  </button>
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

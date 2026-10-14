@@ -1,0 +1,39 @@
+.full-width {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.session-date {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 0.5rem;
+}
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  .btn {
+    height: 48px;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.file-input {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .session-date {
+    grid-template-columns: 1fr;
+  }
+}

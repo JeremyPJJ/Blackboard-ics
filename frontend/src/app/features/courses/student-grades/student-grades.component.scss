@@ -1,0 +1,89 @@
+.loading-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  color: var(--color-text-light);
+}
+
+.empty-note {
+  padding: 0.5rem 0;
+  color: var(--color-text-light);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.grades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+
+  th {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #eef1f5;
+  }
+
+  tfoot td {
+    font-weight: 600;
+    color: var(--color-primary);
+    background: #f8fafc;
+  }
+}
+
+.course-name {
+  font-weight: 500;
+  color: var(--color-gray-dark);
+
+  .course-link {
+    margin-left: 0.5rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    line-height: 28px;
+    text-transform: none;
+
+    mat-icon {
+      margin-right: 2px;
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}
+
+.kind-badge {
+  font-size: 0.6875rem;
+  background: #eef1f5;
+  color: var(--color-gray-dark);
+  text-transform: capitalize;
+}
+
+.kind-badge.kind-examen {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+.kind-badge.kind-foro {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.score-cell {
+  text-align: center;
+  font-weight: 600;
+}
+
+.avg-cell {
+  text-align: center;
+  font-weight: 700;
+  color: var(--color-primary);
+}

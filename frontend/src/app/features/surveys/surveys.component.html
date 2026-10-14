@@ -1,0 +1,63 @@
+<section class="surveys-container" aria-labelledby="surveys-title">
+  <header class="page-header">
+    <div class="page-header-left">
+      <app-back-button></app-back-button>
+      <div>
+        <h1 id="surveys-title">Encuestas</h1>
+        <p class="page-subtitle">Responde encuestas o crea las tuyas</p>
+      </div>
+    </div>
+    <button class="btn btn-primary" *ngIf="can('encuestas.crear')" (click)="openCreate()">
+      <mat-icon>add</mat-icon> Nueva Encuesta
+    </button>
+  </header>
+
+  <app-loading-message *ngIf="isLoading" message="Cargando encuestas..."></app-loading-message>
+
+  <section class="survey-section" *ngIf="!isLoading">
+    <h2>Para responder ({{ toRespond.length }})</h2>
+    <app-empty-state *ngIf="toRespond.length === 0" message="No tienes encuestas pendientes"></app-empty-state>
+    <div class="survey-grid" *ngIf="toRespond.length > 0">
+      <div class="survey-card" *ngFor="let survey of toRespond">
+        <h3>{{ survey.title }}</h3>
+        <p *ngIf="survey.description">{{ survey.description }}</p>
+        <div class="survey-meta">
+          <span *ngIf="survey.isAnonymous" class="badge badge-info">Anónima</span>
+          <span>Vence: {{ survey.endDate | date:'short' }}</span>
+        </div>
+        <button class="btn btn-primary" (click)="openRespond(survey)">Responder</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="survey-section" *ngIf="!isLoading && mine.length > 0">
+    <h2>Mis encuestas ({{ mine.length }})</h2>
+    <div class="survey-grid">
+      <div class="survey-card" *ngFor="let survey of mine">
+        <h3>{{ survey.title }}</h3>
+        <p *ngIf="survey.description">{{ survey.description }}</p>
+        <div class="survey-meta">
+          <span class="badge">{{ survey.responses?.length || 0 }} respuestas</span>
+          <span class="badge" [class.badge-success]="isSurveyActive(survey)" [class.badge-danger]="!isSurveyActive(survey)">
+            {{ isSurveyActive(survey) ? 'Activa' : 'Expirada' }}
+          </span>
+          <span class="badge badge-info">{{ targetRoleLabel(survey.targetRole) }}</span>
+          <span *ngIf="survey.isAnonymous" class="badge badge-warning">Anónima</span>
+        </div>
+        <div class="survey-progress" *ngIf="survey.maxResponses">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="progressWidth(survey)"></div>
+          </div>
+          <span class="progress-label">{{ percentFilled(survey) }}% completado ({{ survey.responses?.length || 0 }}/{{ survey.maxResponses }})</span>
+        </div>
+        <p class="survey-dates" *ngIf="survey.startDate && survey.endDate">
+          {{ survey.startDate | date:'shortDate' }} → {{ survey.endDate | date:'shortDate' }}
+        </p>
+        <div class="survey-actions">
+          <button class="btn btn-secondary" (click)="openResults(survey)">Ver resultados</button>
+          <button class="btn btn-primary" (click)="openEdit(survey)">Editar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>

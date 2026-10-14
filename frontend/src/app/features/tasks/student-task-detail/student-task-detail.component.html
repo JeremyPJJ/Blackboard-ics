@@ -1,0 +1,80 @@
+﻿
+    <section class="task-detail" aria-labelledby="task-title">
+      <app-loading-message *ngIf="isLoading" message="Cargando tarea..."></app-loading-message>
+
+      <div *ngIf="!isLoading && task" class="task-content">
+        <div class="back-row">
+          <app-back-button></app-back-button>
+        </div>
+        <header class="task-header">
+          <div>
+            <h1 id="task-title">{{ task.title }}</h1>
+            <p class="task-meta">
+              Semana {{ task.weekNumber }} - Sesión {{ task.sessionNumber }} ·
+              {{ task.deadline ? ('Fecha límite: ' + (task.deadline | date:'fullDate')) : 'Sin fecha límite' }}
+            </p>
+          </div>
+          <span class="badge"
+                [class.badge-warning]="submissionStatus === 'pendiente'"
+                [class.badge-info]="submissionStatus === 'entregado'"
+                [class.badge-success]="submissionStatus === 'calificado'">
+            {{ submissionStatus }}
+          </span>
+        </header>
+
+        <div class="task-description" *ngIf="task.description">
+          <h2>Descripción</h2>
+          <p>{{ task.description }}</p>
+        </div>
+
+        <div *ngIf="submission?.score !== undefined && submission?.score !== null" class="submission-result">
+          <h2>Tu calificación</h2>
+          <p class="score-value">{{ submission.score }}<span *ngIf="task.maxScore"> / {{ task.maxScore }}</span></p>
+          <p *ngIf="submission.feedback">Retroalimentación: {{ submission.feedback }}</p>
+        </div>
+
+        <!-- Formulario de entrega (solo si aún no entregó) -->
+        <div *ngIf="!submission" class="submit-section">
+          <h2>Entregar tarea</h2>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Comentario / texto de la tarea</mat-label>
+            <textarea matInput [(ngModel)]="comments" name="comments" rows="5"
+                      placeholder="Escribe tu respuesta o un comentario..."></textarea>
+          </mat-form-field>
+
+          <div class="file-upload">
+            <input #fileInput type="file" id="taskFile" class="file-input"
+                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                   (change)="onFileSelected($event)" />
+            <label for="taskFile" class="btn btn-outline">
+              <mat-icon>attach_file</mat-icon>
+              {{ selectedFile ? selectedFile.name : 'Adjuntar archivo (PDF, DOC, imagen)' }}
+            </label>
+            <button *ngIf="selectedFile" mat-icon-button color="warn" type="button" (click)="clearFile()" aria-label="Quitar archivo">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="submit-actions">
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting || (!comments && !selectedFile)">
+              {{ isSubmitting ? 'Subiendo...' : 'Entregar Tarea' }}
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="submission" class="submission-info">
+          <h2>Tu entrega</h2>
+          <p>Fecha: {{ submission.submittedAt | date:'fullDate' }}</p>
+          <p *ngIf="submission.comments">Comentario: {{ submission.comments }}</p>
+          <p *ngIf="submission.fileIds?.length > 0">
+            Archivos: {{ submission.fileIds.length }}
+            <button mat-stroked-button color="primary" class="file-link" *ngFor="let fileId of submission.fileIds; let fi = index"
+                    (click)="downloadFile(fileId, fi)">
+              <mat-icon>download</mat-icon> Descargar {{ submission.fileIds.length > 1 ? fi + 1 : '' }}
+            </button>
+          </p>
+        </div>
+      </div>
+    </section>
+  

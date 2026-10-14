@@ -1,0 +1,104 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Encuesta' : 'Nueva Encuesta' }}</h2>
+<mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Título</mat-label>
+    <input matInput [(ngModel)]="title" name="title" placeholder="Título de la encuesta" />
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Descripción</mat-label>
+    <textarea matInput [(ngModel)]="description" name="description" rows="2"></textarea>
+  </mat-form-field>
+
+  <div class="config-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Dirigida a</mat-label>
+      <mat-select [(ngModel)]="targetRole" name="target" [disabled]="isTeacherOnly">
+        <mat-option value="estudiante">Estudiantes</mat-option>
+        <mat-option value="docente" *ngIf="!isTeacherOnly">Docentes</mat-option>
+        <mat-option value="todos" *ngIf="!isTeacherOnly">Todos</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-checkbox [(ngModel)]="isAnonymous" name="anon" color="primary">Anónima</mat-checkbox>
+  </div>
+  <p class="role-hint" *ngIf="isTeacherOnly">Como docente, las encuestas solo pueden dirigirse a estudiantes.</p>
+
+  <div class="config-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Inicio</mat-label>
+      <input matInput [matDatepicker]="startP" [(ngModel)]="startDate" name="start" />
+      <mat-datepicker-toggle matSuffix [for]="startP"></mat-datepicker-toggle>
+      <mat-datepicker #startP></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Fin</mat-label>
+      <input matInput [matDatepicker]="endP" [(ngModel)]="endDate" name="end" />
+      <mat-datepicker-toggle matSuffix [for]="endP"></mat-datepicker-toggle>
+      <mat-datepicker #endP></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <!-- Preguntas -->
+  <div class="questions-header">
+    <h3>Preguntas ({{ questions.length }})</h3>
+    <button mat-stroked-button color="primary" (click)="addQuestion()">
+      <mat-icon>add</mat-icon> Agregar pregunta
+    </button>
+  </div>
+
+  <div class="question-card" *ngFor="let q of questions; let qi = index">
+    <div class="q-card-header">
+      <span class="q-number">{{ qi + 1 }}</span>
+      <mat-form-field appearance="outline" class="q-text-field">
+        <input matInput [(ngModel)]="q.text" name="qtext{{qi}}" placeholder="Escribe la pregunta..." />
+      </mat-form-field>
+      <button mat-icon-button color="warn" (click)="removeQuestion(qi)" aria-label="Eliminar pregunta">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+
+    <div class="q-type-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo</mat-label>
+        <mat-select [(ngModel)]="q.type" name="qtype{{qi}}">
+          <mat-option value="texto">Respuesta corta / texto</mat-option>
+          <mat-option value="seleccion_unica">Opción única</mat-option>
+          <mat-option value="seleccion_multiple">Opciones múltiples</mat-option>
+          <mat-option value="escala">Escala</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="q.required" name="qreq{{qi}}" color="primary">Obligatoria</mat-checkbox>
+    </div>
+
+    <div class="options-editor" *ngIf="q.type === 'seleccion_unica' || q.type === 'seleccion_multiple'">
+      <div class="option-row" *ngFor="let opt of q.options; let oi = index">
+        <mat-icon class="opt-icon">{{ q.type === 'seleccion_unica' ? 'radio_button_unchecked' : 'check_box_outline_blank' }}</mat-icon>
+        <mat-form-field appearance="outline" class="opt-field">
+          <input matInput [(ngModel)]="opt.text" name="opt{{qi}}_{{oi}}" placeholder="Opción {{ oi + 1 }}" />
+        </mat-form-field>
+        <button mat-icon-button color="warn" (click)="q.options.splice(oi, 1)" aria-label="Eliminar opción">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <button mat-button color="primary" (click)="q.options.push({ text: '' })">
+        <mat-icon>add</mat-icon> Agregar opción
+      </button>
+    </div>
+
+    <div class="scale-row" *ngIf="q.type === 'escala'">
+      <span>Desde</span>
+      <input class="scale-input" type="number" [(ngModel)]="q.minScale" name="min{{qi}}" min="0" max="10" />
+      <span>hasta</span>
+      <input class="scale-input" type="number" [(ngModel)]="q.maxScale" name="max{{qi}}" min="1" max="10" />
+    </div>
+  </div>
+
+  <button mat-stroked-button color="primary" class="add-question-btn" (click)="addQuestion()">
+    <mat-icon>add</mat-icon> Agregar pregunta
+  </button>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" [disabled]="!title || questions.length === 0 || !validQuestions()" (click)="save()">
+    {{ isEdit ? 'Guardar cambios' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

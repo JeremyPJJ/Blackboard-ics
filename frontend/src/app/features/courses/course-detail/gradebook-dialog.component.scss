@@ -1,0 +1,205 @@
+.loading-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  color: var(--color-text-light);
+}
+
+.empty-note {
+  padding: 1rem;
+  color: var(--color-text-light);
+}
+
+.weights-section {
+  background: #f8fafc;
+  border: 1px solid #e3e8ef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    color: var(--color-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+  }
+}
+
+.weights-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.weight-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.weight-key {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 0.9375rem;
+}
+
+.weight-desc {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  max-width: 110px;
+}
+
+.weight-input {
+  width: 84px;
+
+  ::ng-deep .mat-form-field-wrapper { padding-bottom: 0; }
+}
+
+.weight-total {
+  margin: 0.75rem 0 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+
+  &.weight-ok { color: var(--color-success); }
+  &.weight-bad { color: var(--color-danger); }
+}
+
+.weight-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.grade-table-wrap {
+  overflow-x: auto;
+}
+
+.grade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+
+  th {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.625rem 0.75rem;
+    text-align: center;
+    font-weight: 500;
+
+    small { opacity: 0.85; font-weight: 400; }
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #eef1f5;
+    text-align: center;
+  }
+
+  tfoot td {
+    font-weight: 600;
+    color: var(--color-primary);
+    background: #f8fafc;
+  }
+}
+
+.student-col {
+  text-align: left !important;
+}
+
+.student-name {
+  font-weight: 500;
+  color: var(--color-gray-dark);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.score-cell {
+  color: var(--color-gray-dark);
+}
+
+.final-cell {
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(0, 51, 102, 0.04);
+}
+
+.grade-hint {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+.weights-row .weight-item {
+  flex-wrap: wrap;
+}
+
+.key-input { width: 90px; }
+.label-input { width: 150px; }
+.source-input { width: 150px; }
+
+.detail-section {
+  margin-top: 1.25rem;
+
+  h3 {
+    color: var(--color-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+}
+
+.detail-panel {
+  border-radius: 8px !important;
+  border: 1px solid #e3e8ef;
+  box-shadow: none !important;
+  margin-bottom: 0.5rem;
+
+  ::ng-deep .mat-expansion-panel-header {
+    padding: 0 1.25rem;
+    height: 52px;
+  }
+}
+
+.dp-icon {
+  color: var(--color-primary);
+  margin-right: 0.5rem;
+}
+
+.detail-table-wrap {
+  overflow-x: auto;
+  padding: 0.25rem 0;
+}
+
+.detail-table {
+  th {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.manual-input {
+  width: 64px;
+  padding: 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+
+  &:focus { outline: none; border-color: var(--color-primary); }
+}
+
+.exam-input {
+  width: 64px;
+  padding: 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+
+  &:focus { outline: none; border-color: var(--color-primary); }
+}

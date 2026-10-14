@@ -1,0 +1,199 @@
+<h2 mat-dialog-title>Registro de Notas</h2>
+<mat-dialog-content>
+  <div class="loading-row" *ngIf="isLoading">
+    <mat-spinner diameter="28"></mat-spinner>
+    <span>Cargando calificaciones...</span>
+  </div>
+
+  <div *ngIf="!isLoading && tasks.length === 0 && exams.length === 0 && forums.length === 0" class="empty-note">
+    <p>Este curso aún no tiene tareas, foros evaluados ni exámenes.</p>
+  </div>
+
+  <!-- Configuración de variables -->
+  <div class="weights-section" *ngIf="!isLoading">
+    <h3>Variables de calificación — el docente decide qué campos usa y su peso</h3>
+    <div class="weights-row">
+      <div class="weight-item" *ngFor="let v of variables; let vi = index">
+        <mat-form-field appearance="outline" class="key-input">
+          <mat-label>Código</mat-label>
+          <input matInput [(ngModel)]="v.key" name="key{{vi}}" maxlength="4" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="label-input">
+          <mat-label>Campo</mat-label>
+          <input matInput [(ngModel)]="v.label" name="label{{vi}}" placeholder="Ej: Foros" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="source-input">
+          <mat-label>Fuente</mat-label>
+          <mat-select [(ngModel)]="v.source" name="source{{vi}}">
+            <mat-option value="foro">Foros</mat-option>
+            <mat-option value="tarea">Tareas</mat-option>
+            <mat-option value="examen">Exámenes</mat-option>
+            <mat-option value="manual">Manual (docente)</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="weight-input">
+          <mat-label>Peso %</mat-label>
+          <input matInput type="number" min="0" max="100" [(ngModel)]="v.weight" name="w{{vi}}" />
+        </mat-form-field>
+        <button mat-icon-button color="warn" (click)="removeVariable(vi)" aria-label="Quitar campo">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <button mat-stroked-button color="primary" (click)="addVariable()">
+        <mat-icon>add</mat-icon> Agregar campo
+      </button>
+      <button mat-stroked-button (click)="resetWeights()">Restablecer</button>
+    </div>
+    <p class="weight-total" [class.weight-ok]="totalWeight() === 100" [class.weight-bad]="totalWeight() !== 100">
+      Total: {{ totalWeight() }}% {{ totalWeight() === 100 ? '✓' : '(debe sumar 100%)' }}
+    </p>
+  </div>
+
+  <!-- Tabla resumen -->
+  <div class="grade-table-wrap" *ngIf="!isLoading && hasAnyData()">
+    <table class="grade-table" aria-label="Resumen de notas">
+      <thead>
+        <tr>
+          <th scope="col" class="student-col">Estudiante</th>
+          <th scope="col" *ngFor="let v of variables" [title]="sourceLabel(v.source)">{{ v.label }}<br><small>{{ v.weight }}%</small></th>
+          <th scope="col">Nota Final</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">
+          <td class="student-name">{{ student.name }}</td>
+          <td class="score-cell" *ngFor="let v of variables">{{ variableScore(student.id, v) ?? '—' }}</td>
+          <td class="final-cell">{{ finalScore(student.id) ?? '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Detalle por evaluación (expansion panels) -->
+  <div class="detail-section" *ngIf="!isLoading && hasAnyData()">
+    <h3>Detalle por evaluación</h3>
+
+    <!-- Tareas -->
+    <mat-expansion-panel class="detail-panel" *ngIf="tasks.length > 0 && hasVariableWithSource('tarea')">
+      <mat-expansion-panel-header>
+        <mat-panel-title><mat-icon class="dp-icon">assignment</mat-icon> Tareas ({{ tasks.length }})</mat-panel-title>
+        <mat-panel-description>Nota individual por tarea y estudiante</mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="detail-table-wrap">
+        <table class="grade-table detail-table">
+          <thead>
+            <tr>
+              <th scope="col" class="student-col">Estudiante</th>
+              <th scope="col" *ngFor="let task of tasks" [title]="task.title">{{ task.title }}</th>
+              <th scope="col">Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students">
+              <td class="student-name">{{ student.name }}</td>
+              <td class="score-cell" *ngFor="let task of tasks">{{ taskScore(student.id, task._id) }}</td>
+              <td class="final-cell">{{ studentTaskAverage(student.id) ?? '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Foros -->
+    <mat-expansion-panel class="detail-panel" *ngIf="forums.length > 0 && hasVariableWithSource('foro')">
+      <mat-expansion-panel-header>
+        <mat-panel-title><mat-icon class="dp-icon">forum</mat-icon> Foros ({{ forums.length }})</mat-panel-title>
+        <mat-panel-description>Nota individual por foro y estudiante</mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="detail-table-wrap">
+        <table class="grade-table detail-table">
+          <thead>
+            <tr>
+              <th scope="col" class="student-col">Estudiante</th>
+              <th scope="col" *ngFor="let forum of forums" [title]="forum.title">{{ forum.title }}</th>
+              <th scope="col">Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students">
+              <td class="student-name">{{ student.name }}</td>
+              <td class="score-cell" *ngFor="let forum of forums">{{ forumScore(student.id, forum._id) }}</td>
+              <td class="final-cell">{{ studentForumAverage(student.id) ?? '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Exámenes -->
+    <mat-expansion-panel class="detail-panel" *ngIf="exams.length > 0 && hasVariableWithSource('examen')">
+      <mat-expansion-panel-header>
+        <mat-panel-title><mat-icon class="dp-icon">quiz</mat-icon> Exámenes ({{ exams.length }})</mat-panel-title>
+        <mat-panel-description>Mejor intento por examen y estudiante</mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="detail-table-wrap">
+        <table class="grade-table detail-table">
+          <thead>
+            <tr>
+              <th scope="col" class="student-col">Estudiante</th>
+              <th scope="col" *ngFor="let exam of exams" [title]="exam.title">{{ exam.title }}</th>
+              <th scope="col">Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students">
+              <td class="student-name">{{ student.name }}</td>
+              <td class="score-cell" *ngFor="let exam of exams">
+                <ng-container *ngIf="canGradeExams && bestAttempt(student.id, exam); else examScoreText">
+                  <input class="exam-input" type="number" min="0" [max]="examMaxFor(student.id, exam)"
+                         [(ngModel)]="examScores[student.id + '|' + exam._id]"
+                         [name]="'exam' + student.id + exam._id"
+                         [attr.aria-label]="'Nota de ' + student.name + ' en ' + exam.title"
+                         (change)="saveExamScore(student.id, exam, $event)" />
+                </ng-container>
+                <ng-template #examScoreText>{{ examScore(student.id, exam) }}</ng-template>
+              </td>
+              <td class="final-cell">{{ studentExamAverage(student.id) ?? '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Manual (NC + ACT) -->
+    <mat-expansion-panel class="detail-panel" *ngIf="hasVariableWithSource('manual')">
+      <mat-expansion-panel-header>
+        <mat-panel-title><mat-icon class="dp-icon">how_to_reg</mat-icon> Conceptual y Actitudinal (manual)</mat-panel-title>
+        <mat-panel-description>El docente escribe la nota directamente</mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="detail-table-wrap">
+        <table class="grade-table detail-table">
+          <thead>
+            <tr>
+              <th scope="col" class="student-col">Estudiante</th>
+              <th scope="col" *ngFor="let v of variables | sourceFilter:'manual'">{{ v.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students">
+              <td class="student-name">{{ student.name }}</td>
+              <td class="score-cell" *ngFor="let v of variables | sourceFilter:'manual'">
+                <input class="manual-input" type="number" min="0" max="20"
+                       [(ngModel)]="manualScores[student.id + '|' + v.key]"
+                       [name]="'manual' + student.id + v.key" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-expansion-panel>
+  </div>
+
+  <div class="grade-hint" *ngIf="!isLoading && hasAnyData()">
+    * Las notas son preliminares (borrador). Las notas oficiales que cuentan son las del Q10.
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" (click)="saveConfig()">Guardar notas</button>
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>
