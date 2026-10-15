@@ -16,10 +16,17 @@ export class MessagingComponent implements OnInit {
     // activos fuera de /messaging, así que NO se desconecta al salir.
     this.store.connect();
     await this.store.loadConversations();
+
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      this.store.selectedConversationId.set(null);
+      this.store.messages.set([]);
+      return;
+    }
+
     if (!this.store.selectedConversationId()) {
       const first = this.store.sortedConversations()[0];
       if (first) {
-        this.store.selectConversation(first._id);
+        void this.store.selectConversation(first._id);
       }
     }
   }

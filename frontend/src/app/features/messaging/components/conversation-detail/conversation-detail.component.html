@@ -1,6 +1,14 @@
 <div class="conversation-detail">
   <ng-container *ngIf="store.selectedConversation() as conversation; else emptyState">
     <div class="detail-header">
+      <button
+        type="button"
+        class="back-button"
+        (click)="closeConversation()"
+        aria-label="Volver a conversaciones"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
       <h2>{{ store.displayNameFor(conversation) }}</h2>
       <span class="participant-count">
         {{ conversation.participants.length }} participante{{ conversation.participants.length === 1 ? '' : 's' }}

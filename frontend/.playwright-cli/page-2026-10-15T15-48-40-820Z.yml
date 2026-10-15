@@ -1,0 +1,32 @@
+- main [ref=e3]:
+  - generic [ref=e5]:
+    - main [ref=e6]:
+      - generic [ref=e7]:
+        - region "Información institucional" [ref=e8]:
+          - img "IESTP Ciencias de la Salud" [ref=e9]
+          - heading "IESTP Ciencias de la Salud" [level=1] [ref=e10]
+          - paragraph [ref=e11]: Servicio de Desarrollo de Clases
+          - paragraph [ref=e12]: SIGA-ICS
+        - generic [ref=e13]:
+          - heading "Iniciar Sesión" [level=2] [ref=e14]
+          - paragraph [ref=e15]: Ingrese sus credenciales institucionales
+          - generic [ref=e16]:
+            - generic [ref=e19]:
+              - generic [ref=e20]:
+                - text: Correo Institucional
+                - generic [aria-hidden] [ref=e21]: "*"
+              - img [aria-hidden] [ref=e23]: email
+              - textbox "Correo Institucional" [ref=e25]:
+                - /placeholder: usuario@ics.edu.pe
+            - generic [ref=e29]:
+              - generic [ref=e30]:
+                - text: Contraseña
+                - generic [aria-hidden] [ref=e31]: "*"
+              - img [aria-hidden] [ref=e33]: lock
+              - textbox "Contraseña" [ref=e35]:
+                - /placeholder: ••••••••
+              - button "Mostrar contraseña" [ref=e37] [cursor=pointer]:
+                - img [aria-hidden] [ref=e38]: visibility_off
+            - button "Ingresar" [disabled]
+          - paragraph [ref=e42]: ¿Olvidó su contraseña? Contacte al administrador del sistema
+    - paragraph [ref=e44]: © 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.

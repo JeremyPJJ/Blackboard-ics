@@ -60,7 +60,7 @@ export class TrashListComponent implements OnInit {
     private trashService: TrashService,
     private notificationService: NotificationService,
     private dialog: MatDialog,
-  ) {}
+  ) { }
 
   async ngOnInit(): Promise<void> {
     if (this.store.entries().length === 0) {

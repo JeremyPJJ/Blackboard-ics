@@ -182,4 +182,4 @@ import { MeetingsSectionComponent } from '@features/courses/course-detail/meetin
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

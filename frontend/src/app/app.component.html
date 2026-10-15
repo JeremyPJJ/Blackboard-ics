@@ -7,13 +7,14 @@
         <p class="subtitle">Servicio de Desarrollo de Clases</p>
       </div>
     </div>
-    
+
     <nav class="nav-menu" *ngIf="isAuthenticated">
       <div class="nav-user-greeting">
         <span class="greeting-role">{{ roleLabel }}</span>
         <strong class="greeting-name">{{ userName }}</strong>
       </div>
-      <button mat-button matTooltip="Dashboard" [routerLink]="['/dashboard', isAdmin ? 'admin' : 'teacher']" routerLinkActive="active">
+      <button mat-button matTooltip="Dashboard" [routerLink]="['/dashboard', isAdmin ? 'admin' : 'teacher']"
+        routerLinkActive="active">
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </button>
@@ -35,12 +36,14 @@
         <span>Mensajería</span>
         <span class="nav-badge" *ngIf="messagingStore.totalUnread() > 0">{{ messagingStore.totalUnread() }}</span>
       </button>
-      <button mat-button matTooltip="Ofertas laborales" routerLink="/jobs" routerLinkActive="active" *ngIf="canViewJobs && !canManageJobs">
+      <button mat-button matTooltip="Ofertas laborales" routerLink="/jobs" routerLinkActive="active"
+        *ngIf="canViewJobs && !canManageJobs">
         <mat-icon>work</mat-icon>
         <span>Ofertas</span>
         <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
       </button>
-      <button mat-button matTooltip="Gestionar ofertas" routerLink="/jobs/admin" routerLinkActive="active" *ngIf="canManageJobs">
+      <button mat-button matTooltip="Gestionar ofertas" routerLink="/jobs/admin" routerLinkActive="active"
+        *ngIf="canManageJobs">
         <mat-icon>admin_panel_settings</mat-icon>
         <span>{{ canViewJobs ? 'Gestionar Ofertas' : 'Registrar oferta' }}</span>
         <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
@@ -53,26 +56,13 @@
   </div>
 </mat-toolbar>
 
-<button
-  mat-fab
-  color="primary"
-  class="profile-fab"
-  *ngIf="isAuthenticated && !isLoginPage"
-  (click)="openProfile()"
-  matTooltip="Mi perfil"
-  aria-label="Mi perfil"
->
+<button mat-fab color="primary" class="profile-fab" *ngIf="isAuthenticated && !isLoginPage && !isMessagingPage"
+  (click)="openProfile()" matTooltip="Mi perfil" aria-label="Mi perfil">
   <mat-icon>account_circle</mat-icon>
 </button>
 
-<button
-  mat-fab
-  class="trash-fab"
-  *ngIf="isAdmin && !isLoginPage"
-  (click)="openTrash()"
-  matTooltip="Papelera"
-  aria-label="Papelera"
->
+<button mat-fab class="trash-fab" *ngIf="isAdmin && !isLoginPage && !isMessagingPage" (click)="openTrash()"
+  matTooltip="Papelera" aria-label="Papelera">
   <mat-icon>delete</mat-icon>
 </button>
 

@@ -1,4 +1,7 @@
-<div class="messaging-container">
+<div
+  class="messaging-container"
+  [class.mobile-detail-open]="!!store.selectedConversationId()"
+>
   <div class="messaging-header">
     <div class="messaging-header-left">
       <h1>Mensajería</h1>
@@ -21,7 +24,7 @@
       <app-conversation-list></app-conversation-list>
     </aside>
 
-    <section class="detail-pane">
+    <section class="detail-pane" aria-label="Conversación seleccionada">
       <app-conversation-detail></app-conversation-detail>
     </section>
   </div>

@@ -33,6 +33,11 @@ export class ConversationDetailComponent implements AfterViewChecked {
     return this.store.selectedConversation()?.participantNames?.[senderId] ?? 'Usuario';
   }
 
+  closeConversation(): void {
+    this.store.selectedConversationId.set(null);
+    this.store.messages.set([]);
+  }
+
   private scrollToBottom(): void {
     if (this.messagesContainer?.nativeElement) {
       this.messagesContainer.nativeElement.scrollTop =

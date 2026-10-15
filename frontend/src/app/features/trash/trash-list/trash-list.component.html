@@ -59,10 +59,8 @@
         <ng-container matColumnDef="restoreUntil">
           <th mat-header-cell *matHeaderCellDef>Restaurable hasta</th>
           <td mat-cell *matCellDef="let entry">
-            <span
-              [class.expired]="isExpired(entry)"
-              [matTooltip]="isExpired(entry) ? 'Período de restauración vencido' : ''"
-            >
+            <span [class.expired]="isExpired(entry)"
+              [matTooltip]="isExpired(entry) ? 'Período de restauración vencido' : ''">
               {{ entry.restoreUntil | date: 'dd/MM/yyyy' }}
             </span>
           </td>
@@ -86,23 +84,15 @@
           <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let entry">
             <div class="row-actions">
-              <button
-                mat-stroked-button
-                color="primary"
-                (click)="restore(entry)"
+              <button mat-stroked-button color="primary" (click)="restore(entry)"
                 [disabled]="busyEntryId() === entry._id || isExpired(entry)"
-                [matTooltip]="isExpired(entry) ? 'El período de restauración ha expirado' : 'Restaurar elemento'"
-              >
+                [matTooltip]="isExpired(entry) ? 'El período de restauración ha expirado' : 'Restaurar elemento'">
                 <mat-icon>restore</mat-icon>
                 Restaurar
               </button>
-              <button
-                mat-flat-button
-                class="danger-btn"
-                (click)="permanentlyDelete(entry)"
+              <button mat-flat-button class="danger-btn" (click)="permanentlyDelete(entry)"
                 [disabled]="busyEntryId() === entry._id"
-                [matTooltip]="'Eliminar definitivamente (incluye el documento original)'"
-              >
+                [matTooltip]="'Eliminar definitivamente (incluye el documento original)'">
                 <mat-icon>delete_forever</mat-icon>
                 Eliminar
               </button>

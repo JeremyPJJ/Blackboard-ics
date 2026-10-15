@@ -1,20 +1,20 @@
-import {
-  MAT_RIPPLE_GLOBAL_OPTIONS,
-  MatRipple
-} from "./chunk-CXVQPFBD.js";
-import {
-  _StructuralStylesLoader
-} from "./chunk-IEZ54P5E.js";
 import "./chunk-OIBNGD5S.js";
 import {
   CdkPortal,
   CdkPortalOutlet,
   TemplatePortal
-} from "./chunk-GEJLOMEC.js";
+} from "./chunk-M5E57NSQ.js";
+import {
+  MAT_RIPPLE_GLOBAL_OPTIONS,
+  MatRipple
+} from "./chunk-EV7MQJTG.js";
+import {
+  _StructuralStylesLoader
+} from "./chunk-7HEO2OZU.js";
 import {
   SharedResizeObserver
-} from "./chunk-CDJXTJI7.js";
-import "./chunk-4PWHJYWJ.js";
+} from "./chunk-DGLBL5EM.js";
+import "./chunk-57YQALPK.js";
 import "./chunk-42FJBLFI.js";
 import "./chunk-JXBCBRYI.js";
 import {
@@ -26,28 +26,28 @@ import {
   MatCommonModule,
   SPACE,
   hasModifierKey
-} from "./chunk-ILFGB623.js";
+} from "./chunk-TA5R26KC.js";
 import {
   _IdGenerator
-} from "./chunk-QOUY6ULH.js";
-import {
-  _CdkPrivateStyleLoader,
-  _bindEventWithOptions
-} from "./chunk-QTADPS75.js";
+} from "./chunk-6ES6PLTX.js";
 import {
   CdkScrollable,
   ViewportRuler
-} from "./chunk-BQ3ZRBDZ.js";
-import "./chunk-F6NCJ5BH.js";
+} from "./chunk-SMZSU4CY.js";
+import "./chunk-P3FLHKIJ.js";
 import "./chunk-2O4WY5GE.js";
 import {
   Directionality
-} from "./chunk-FIRGYPZI.js";
+} from "./chunk-34RVYATL.js";
+import {
+  _CdkPrivateStyleLoader,
+  _bindEventWithOptions
+} from "./chunk-YJT3YGM6.js";
 import {
   Platform
-} from "./chunk-56UWAUVK.js";
-import "./chunk-Q6RC5FAB.js";
-import "./chunk-L4XFFSU2.js";
+} from "./chunk-VZZU5DZ3.js";
+import "./chunk-FISAF5ZQ.js";
+import "./chunk-OWAK3GFO.js";
 import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
@@ -116,11 +116,11 @@ import {
   ɵɵtext,
   ɵɵtextInterpolate,
   ɵɵviewQuery
-} from "./chunk-OZUXW47E.js";
-import "./chunk-WMWTRTCA.js";
+} from "./chunk-6GODZDIA.js";
+import "./chunk-TGLHJ2WD.js";
 import {
   merge
-} from "./chunk-QO67QQ3F.js";
+} from "./chunk-IQJPSORH.js";
 import {
   BehaviorSubject,
   EMPTY,
@@ -135,7 +135,8 @@ import {
   switchMap,
   takeUntil,
   timer
-} from "./chunk-PADBOZH3.js";
+} from "./chunk-ML42AD4R.js";
+import "./chunk-HM5YLMWO.js";
 import "./chunk-N6ESDQJH.js";
 
 // node_modules/@angular/material/fesm2022/tabs.mjs

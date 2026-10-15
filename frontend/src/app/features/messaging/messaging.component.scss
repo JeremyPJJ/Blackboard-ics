@@ -83,11 +83,75 @@
 }
 
 @media (max-width: 768px) {
-  .messaging-layout {
-    grid-template-columns: 1fr;
+  .messaging-container {
+    width: 100%;
+    height: calc(100dvh - 165px);
+    min-height: 480px;
+    padding: 0;
   }
 
-  .conversations-pane {
-    max-height: 40%;
+  .messaging-header {
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+
+    h1 {
+      font-size: 1.4rem;
+    }
+  }
+
+  .messaging-header-left {
+    min-width: 0;
+    gap: 0.6rem;
+  }
+
+  .connection-chip {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .total-unread {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .messaging-layout {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .conversations-pane,
+  .detail-pane {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+
+  .detail-pane {
+    display: none;
+  }
+
+  .mobile-detail-open {
+    .messaging-header,
+    .conversations-pane {
+      display: none;
+    }
+
+    .detail-pane {
+      display: block;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .messaging-container {
+    height: calc(100dvh - 155px);
+  }
+
+  .messaging-header {
+    align-items: flex-start;
   }
 }

@@ -24,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isAdmin = false;
   isLoginPage = false;
+  isMessagingPage = false;
   private authSubscription: Subscription;
   private routerSubscription: Subscription;
   private readonly siteName = 'SIGA-ICS';
@@ -40,7 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
     readonly surveysStore: SurveysStore,
     private jobsService: JobsService,
     private surveyService: SurveyService,
-  ) {}
+  ) { }
 
   get userName(): string {
     const u = this.authService.getCurrentUser();
@@ -90,6 +91,7 @@ export class AppComponent implements OnInit, OnDestroy {
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.isLoginPage = event.urlAfterRedirects === '/login';
+      this.isMessagingPage = event.urlAfterRedirects.startsWith('/messaging');
       this.updateTitle();
       // Offline (WS caído): los counts se recalculan vía REST al navegar
       // (Spec O6b esc. Offline — sin doble conteo, REST es autoritativo).
@@ -100,6 +102,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // Check initial route
     this.isLoginPage = this.router.url === '/login';
+    this.isMessagingPage = this.router.url.startsWith('/messaging');
     this.updateTitle();
     this.startExpiryWatcher();
   }
@@ -239,6 +242,8 @@ export class AppComponent implements OnInit, OnDestroy {
   openProfile(): void {
     this.dialog.open(ProfileDialogComponent, {
       width: '520px',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 24px)',
       disableClose: true,
       autoFocus: false,
     });

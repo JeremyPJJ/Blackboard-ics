@@ -34,4 +34,4 @@ import { ProfileDialogComponent } from './profile-dialog/profile-dialog.componen
   ],
   exports: [ProfileDialogComponent],
 })
-export class ProfileModule {}
+export class ProfileModule { }

@@ -1,0 +1,304 @@
+- generic [ref=e1]:
+  - generic [aria-hidden] [ref=e2]:
+    - generic [ref=e50]:
+      - link [ref=e308] [cursor=pointer]:
+        - heading [level=1] [ref=e310]: SIGA-ICS
+      - navigation [ref=e55]:
+        - button [ref=e56]:
+          - img [aria-hidden] [ref=e57]: dashboard
+        - button [ref=e60]:
+          - img [aria-hidden] [ref=e61]: school
+        - button [ref=e64]:
+          - img [aria-hidden] [ref=e65]: people
+        - button [ref=e68]:
+          - img [aria-hidden] [ref=e69]: poll
+        - button [ref=e311]:
+          - img [aria-hidden] [ref=e73]: chat
+          - generic [ref=e74]: "1"
+        - button [ref=e77]:
+          - img [aria-hidden] [ref=e78]: admin_panel_settings
+        - button [ref=e81]:
+          - img [aria-hidden] [ref=e82]: logout
+    - button [ref=e312] [cursor=pointer]:
+      - img [aria-hidden] [ref=e86]: account_circle
+    - button [ref=e313] [cursor=pointer]:
+      - img [aria-hidden] [ref=e90]: delete
+    - main [ref=e3]:
+      - region [ref=e314]:
+        - generic [ref=e96]:
+          - heading [level=1] [ref=e315]: Resumen
+          - paragraph [ref=e98]: Administrador · Resumen general de la institución
+        - region [ref=e316]:
+          - article [ref=e100]:
+            - img [aria-hidden] [ref=e102]: groups
+            - generic [ref=e103]:
+              - heading [level=3] [ref=e317]: Usuarios
+              - paragraph [ref=e105]: "15"
+              - link [ref=e318] [cursor=pointer]:
+                - /url: /users
+                - text: Ver todos
+          - article [ref=e107]:
+            - img [aria-hidden] [ref=e109]: menu_book
+            - generic [ref=e110]:
+              - heading [level=3] [ref=e319]: Cursos Activos
+              - paragraph [ref=e112]: "4"
+              - link [ref=e320] [cursor=pointer]:
+                - /url: /courses
+                - text: Ver todos
+          - article [ref=e114]:
+            - img [aria-hidden] [ref=e116]: person
+            - generic [ref=e117]:
+              - heading [level=3] [ref=e321]: Docentes
+              - paragraph [ref=e119]: "4"
+              - link [ref=e322] [cursor=pointer]:
+                - /url: /users
+                - text: Ver todos
+          - article [ref=e121]:
+            - img [aria-hidden] [ref=e123]: school
+            - generic [ref=e124]:
+              - heading [level=3] [ref=e323]: Estudiantes
+              - paragraph [ref=e126]: "7"
+              - link [ref=e324] [cursor=pointer]:
+                - /url: /users
+                - text: Ver todos
+        - region [ref=e325]:
+          - generic [ref=e129]:
+            - heading [level=2] [ref=e326]: Docentes
+            - generic [ref=e131]:
+              - button [ref=e327]:
+                - generic [ref=e133]: Cifras
+              - button [ref=e328]:
+                - generic [ref=e137]: Gráficos
+          - generic [ref=e140]:
+            - generic [ref=e141] [cursor=pointer]:
+              - img [aria-hidden] [ref=e143]: person
+              - generic [ref=e144]:
+                - strong [ref=e145]: Rosa Quispe Torres
+                - generic [ref=e146]:
+                  - generic [ref=e329]:
+                    - img [aria-hidden] [ref=e148]: menu_book
+                    - text: "2"
+                  - generic [ref=e330]:
+                    - img [aria-hidden] [ref=e150]: event
+                    - text: "2"
+                  - generic [ref=e331]:
+                    - img [aria-hidden] [ref=e152]: assignment
+                    - text: "1"
+                  - generic [ref=e332]:
+                    - img [aria-hidden] [ref=e154]: folder_open
+                    - text: "2"
+                  - generic [ref=e333]:
+                    - img [aria-hidden] [ref=e156]: forum
+                    - text: "2"
+                  - generic [ref=e334]:
+                    - img [aria-hidden] [ref=e158]: quiz
+                    - text: "1"
+                  - generic [ref=e335]:
+                    - img [aria-hidden] [ref=e160]: fact_check
+                    - text: "1"
+              - img [aria-hidden] [ref=e161]: chevron_right
+            - generic [ref=e162] [cursor=pointer]:
+              - img [aria-hidden] [ref=e164]: person
+              - generic [ref=e165]:
+                - strong [ref=e166]: Jorge Luis Huamán Salazar
+                - generic [ref=e167]:
+                  - generic [ref=e336]:
+                    - img [aria-hidden] [ref=e169]: menu_book
+                    - text: "2"
+                  - generic [ref=e337]:
+                    - img [aria-hidden] [ref=e171]: event
+                    - text: "3"
+                  - generic [ref=e338]:
+                    - img [aria-hidden] [ref=e173]: assignment
+                    - text: "3"
+                  - generic [ref=e339]:
+                    - img [aria-hidden] [ref=e175]: folder_open
+                    - text: "2"
+                  - generic [ref=e340]:
+                    - img [aria-hidden] [ref=e177]: forum
+                    - text: "3"
+                  - generic [ref=e341]:
+                    - img [aria-hidden] [ref=e179]: quiz
+                    - text: "1"
+                  - generic [ref=e342]:
+                    - img [aria-hidden] [ref=e181]: fact_check
+                    - text: "2"
+              - img [aria-hidden] [ref=e182]: chevron_right
+            - generic [ref=e183] [cursor=pointer]:
+              - img [aria-hidden] [ref=e185]: person
+              - generic [ref=e186]:
+                - strong [ref=e187]: Carmen Díaz Flores
+                - generic [ref=e188]:
+                  - generic [ref=e343]:
+                    - img [aria-hidden] [ref=e190]: menu_book
+                    - text: "0"
+                  - generic [ref=e344]:
+                    - img [aria-hidden] [ref=e192]: event
+                    - text: "0"
+                  - generic [ref=e345]:
+                    - img [aria-hidden] [ref=e194]: assignment
+                    - text: "0"
+                  - generic [ref=e346]:
+                    - img [aria-hidden] [ref=e196]: folder_open
+                    - text: "0"
+                  - generic [ref=e347]:
+                    - img [aria-hidden] [ref=e198]: forum
+                    - text: "0"
+                  - generic [ref=e348]:
+                    - img [aria-hidden] [ref=e200]: quiz
+                    - text: "0"
+                  - generic [ref=e349]:
+                    - img [aria-hidden] [ref=e202]: fact_check
+                    - text: "0"
+              - img [aria-hidden] [ref=e203]: chevron_right
+            - generic [ref=e204] [cursor=pointer]:
+              - img [aria-hidden] [ref=e206]: person
+              - generic [ref=e207]:
+                - strong [ref=e208]: Smoke Teacher Smoke
+                - generic [ref=e209]:
+                  - generic [ref=e350]:
+                    - img [aria-hidden] [ref=e211]: menu_book
+                    - text: "3"
+                  - generic [ref=e351]:
+                    - img [aria-hidden] [ref=e213]: event
+                    - text: "3"
+                  - generic [ref=e352]:
+                    - img [aria-hidden] [ref=e215]: assignment
+                    - text: "3"
+                  - generic [ref=e353]:
+                    - img [aria-hidden] [ref=e217]: folder_open
+                    - text: "2"
+                  - generic [ref=e354]:
+                    - img [aria-hidden] [ref=e219]: forum
+                    - text: "3"
+                  - generic [ref=e355]:
+                    - img [aria-hidden] [ref=e221]: quiz
+                    - text: "1"
+                  - generic [ref=e356]:
+                    - img [aria-hidden] [ref=e223]: fact_check
+                    - text: "2"
+              - img [aria-hidden] [ref=e224]: chevron_right
+            - button [ref=e357]:
+              - generic [ref=e226]: Ver más docentes
+          - generic [ref=e229]:
+            - generic [ref=e230]:
+              - img [aria-hidden] [ref=e231]: menu_book
+              - text: Cursos
+            - generic [ref=e232]:
+              - img [aria-hidden] [ref=e233]: event
+              - text: Sesiones
+            - generic [ref=e234]:
+              - img [aria-hidden] [ref=e235]: assignment
+              - text: Tareas
+            - generic [ref=e236]:
+              - img [aria-hidden] [ref=e237]: folder_open
+              - text: Recursos
+            - generic [ref=e238]:
+              - img [aria-hidden] [ref=e239]: forum
+              - text: Foros
+            - generic [ref=e240]:
+              - img [aria-hidden] [ref=e241]: quiz
+              - text: Exámenes
+            - generic [ref=e242]:
+              - img [aria-hidden] [ref=e243]: fact_check
+              - text: Registros de asistencia
+            - generic [ref=e244]:
+              - img [aria-hidden] [ref=e245]: chevron_right
+              - text: Clic = ver detalle del docente
+        - region [ref=e358]:
+          - heading [level=2] [ref=e359]: Acciones Rápidas
+          - navigation [ref=e360]:
+            - button [ref=e361] [cursor=pointer]:
+              - img [aria-hidden] [ref=e251]: person_add
+              - text: Nuevo Usuario
+            - button [ref=e362] [cursor=pointer]:
+              - img [aria-hidden] [ref=e253]: add_circle_outline
+              - text: Nuevo Curso
+        - region [ref=e363]:
+          - generic [ref=e255]:
+            - heading [level=2] [ref=e364]: Cursos Recientes
+            - link [ref=e365] [cursor=pointer]:
+              - /url: /courses
+              - text: Ver todos
+          - list [ref=e366]:
+            - listitem [ref=e259] [cursor=pointer]:
+              - generic [ref=e260]:
+                - heading [level=4] [ref=e367]: Cuidados Básicos de Enfermería
+                - generic [ref=e262]: activo
+              - paragraph [ref=e263]: ENFE-101 · Enfermería
+              - paragraph [ref=e264]: "Docente: Rosa Quispe Torres, Jorge Luis Huamán Salazar, Smoke Teacher Smoke"
+              - generic [ref=e265]:
+                - text: Abrir curso
+                - img [aria-hidden] [ref=e266]: chevron_right
+            - listitem [ref=e267] [cursor=pointer]:
+              - generic [ref=e268]:
+                - heading [level=4] [ref=e368]: Farmacología Básica
+                - generic [ref=e270]: activo
+              - paragraph [ref=e271]: FARM-101 · Farmacia
+              - paragraph [ref=e272]: "Docente: Jorge Luis Huamán Salazar, Smoke Teacher Smoke"
+              - generic [ref=e273]:
+                - text: Abrir curso
+                - img [aria-hidden] [ref=e274]: chevron_right
+            - listitem [ref=e275] [cursor=pointer]:
+              - generic [ref=e276]:
+                - heading [level=4] [ref=e369]: Injeccion basica
+                - generic [ref=e278]: activo
+              - paragraph [ref=e279]: EFERME · Enfermería
+              - paragraph [ref=e280]: "Docente: Rosa Quispe Torres, Smoke Teacher Smoke"
+              - generic [ref=e281]:
+                - text: Abrir curso
+                - img [aria-hidden] [ref=e282]: chevron_right
+            - listitem [ref=e283] [cursor=pointer]:
+              - generic [ref=e284]:
+                - heading [level=4] [ref=e370]: Empleabilidad y Emprendimiento
+                - generic [ref=e286]: activo
+              - paragraph [ref=e287]: EMPL-101 · Empleabilidad
+              - paragraph [ref=e288]: "Docente: Sin asignar"
+              - generic [ref=e289]:
+                - text: Abrir curso
+                - img [aria-hidden] [ref=e290]: chevron_right
+    - contentinfo [ref=e291]:
+      - paragraph [ref=e293]: © 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.
+  - dialog [active] [ref=e374]:
+    - generic [ref=e377]:
+      - heading "Mi perfil" [level=2] [ref=e378]
+      - generic [ref=e379]:
+        - generic [ref=e380]:
+          - generic [ref=e381]:
+            - generic [ref=e382]: Nombre
+            - generic [ref=e383]: Carlos Mendoza Ríos
+          - generic [ref=e384]:
+            - generic [ref=e385]: Correo
+            - generic [ref=e386]: carlos.mendoza@ics.edu.pe
+          - generic [ref=e387]:
+            - generic [ref=e388]: Rol
+            - generic [ref=e389]: super_admin
+          - separator [ref=e390]
+        - button "Mis notificaciones" [ref=e391]:
+          - img [aria-hidden] [ref=e392]: notifications
+        - separator [ref=e396]
+        - generic [ref=e397]:
+          - paragraph [ref=e398]: Los administradores no tienen cursos asignados
+          - separator [ref=e399]
+        - heading "Cambiar contraseña" [level=3] [ref=e400]
+        - generic [ref=e401]:
+          - generic [ref=e404]:
+            - generic [ref=e405]:
+              - text: Contraseña actual
+              - generic [aria-hidden] [ref=e406]: "*"
+            - textbox "Contraseña actual" [ref=e408]
+          - generic [ref=e409]:
+            - generic [ref=e411]:
+              - generic [ref=e412]:
+                - text: Nueva contraseña
+                - generic [aria-hidden] [ref=e413]: "*"
+              - textbox "Nueva contraseña" [ref=e415]
+            - generic [ref=e416]: Mínimo 8 caracteres, al menos una letra y un número.
+          - generic [ref=e422]:
+            - generic [ref=e423]:
+              - text: Confirmar nueva contraseña
+              - generic [aria-hidden] [ref=e424]: "*"
+            - textbox "Confirmar nueva contraseña" [ref=e426]
+      - generic [ref=e427]:
+        - button "Cancelar" [ref=e428]
+        - button "Cambiar contraseña" [disabled]
