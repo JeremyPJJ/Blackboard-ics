@@ -1,22 +1,28 @@
+import {
+  SharedResizeObserver
+} from "./chunk-CDJXTJI7.js";
+import {
+  MAT_RIPPLE_GLOBAL_OPTIONS,
+  MatRipple
+} from "./chunk-673IQ5C4.js";
+import "./chunk-4PWHJYWJ.js";
+import "./chunk-42FJBLFI.js";
+import "./chunk-JXBCBRYI.js";
 import "./chunk-OIBNGD5S.js";
 import {
   CdkPortal,
   CdkPortalOutlet,
   TemplatePortal
-} from "./chunk-M5E57NSQ.js";
-import {
-  MAT_RIPPLE_GLOBAL_OPTIONS,
-  MatRipple
-} from "./chunk-EV7MQJTG.js";
+} from "./chunk-GEJLOMEC.js";
 import {
   _StructuralStylesLoader
-} from "./chunk-7HEO2OZU.js";
+} from "./chunk-IEZ54P5E.js";
 import {
-  SharedResizeObserver
-} from "./chunk-DGLBL5EM.js";
-import "./chunk-57YQALPK.js";
-import "./chunk-42FJBLFI.js";
-import "./chunk-JXBCBRYI.js";
+  CdkScrollable,
+  ViewportRuler
+} from "./chunk-ZDM7EPUH.js";
+import "./chunk-2O4WY5GE.js";
+import "./chunk-F6NCJ5BH.js";
 import {
   CdkMonitorFocus,
   CdkObserveContent,
@@ -26,28 +32,22 @@ import {
   MatCommonModule,
   SPACE,
   hasModifierKey
-} from "./chunk-TA5R26KC.js";
+} from "./chunk-CWQH6YFG.js";
 import {
   _IdGenerator
-} from "./chunk-6ES6PLTX.js";
-import {
-  CdkScrollable,
-  ViewportRuler
-} from "./chunk-SMZSU4CY.js";
-import "./chunk-P3FLHKIJ.js";
-import "./chunk-2O4WY5GE.js";
+} from "./chunk-QOUY6ULH.js";
 import {
   Directionality
-} from "./chunk-34RVYATL.js";
+} from "./chunk-FIRGYPZI.js";
 import {
   _CdkPrivateStyleLoader,
   _bindEventWithOptions
-} from "./chunk-YJT3YGM6.js";
+} from "./chunk-LAFYNMII.js";
 import {
   Platform
-} from "./chunk-VZZU5DZ3.js";
-import "./chunk-FISAF5ZQ.js";
-import "./chunk-OWAK3GFO.js";
+} from "./chunk-UVQLHGQF.js";
+import "./chunk-Q6RC5FAB.js";
+import "./chunk-L4XFFSU2.js";
 import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
@@ -116,11 +116,11 @@ import {
   ɵɵtext,
   ɵɵtextInterpolate,
   ɵɵviewQuery
-} from "./chunk-6GODZDIA.js";
-import "./chunk-TGLHJ2WD.js";
+} from "./chunk-OZUXW47E.js";
+import "./chunk-WMWTRTCA.js";
 import {
   merge
-} from "./chunk-IQJPSORH.js";
+} from "./chunk-QO67QQ3F.js";
 import {
   BehaviorSubject,
   EMPTY,
@@ -135,8 +135,7 @@ import {
   switchMap,
   takeUntil,
   timer
-} from "./chunk-ML42AD4R.js";
-import "./chunk-HM5YLMWO.js";
+} from "./chunk-PADBOZH3.js";
 import "./chunk-N6ESDQJH.js";
 
 // node_modules/@angular/material/fesm2022/tabs.mjs
