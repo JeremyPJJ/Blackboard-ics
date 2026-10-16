@@ -39,19 +39,6 @@
     </article>
   </section>
 
-  <div class="notifications-banner" *ngIf="notifications.length > 0">
-    <div class="notification-item" *ngFor="let n of notifications">
-      <mat-icon>notifications</mat-icon>
-      <div class="notification-text">
-        <strong>{{ n.title }}</strong>
-        <span>{{ n.message }}</span>
-      </div>
-      <button mat-icon-button color="primary" (click)="dismissNotification(n._id)" aria-label="Cerrar notificación">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
-
   <section class="attendance-stats" aria-labelledby="attendance-stats-title">
     <header class="section-header">
       <h2 id="attendance-stats-title">Mi Asistencia</h2>

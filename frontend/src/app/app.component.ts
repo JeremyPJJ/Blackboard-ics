@@ -25,6 +25,17 @@ export class AppComponent implements OnInit, OnDestroy {
   isAdmin = false;
   isLoginPage = false;
   isMessagingPage = false;
+  sidebarOpen = false;
+  settingsOpen = false;
+
+  get dashboardLink(): string {
+    const role = this.authService.getCurrentUser()?.role;
+    return '/dashboard/' + (role === 'estudiante' ? 'student' : role === 'docente' ? 'teacher' : 'admin');
+  }
+
+  get canManageUsers(): boolean {
+    return ['super_admin', 'unidad_academica'].includes(this.authService.getCurrentUser()?.role || '');
+  }
   private authSubscription: Subscription;
   private routerSubscription: Subscription;
   private readonly siteName = 'SIGA-ICS';
@@ -90,6 +101,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.routerSubscription = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
+      this.sidebarOpen = false;
       this.isLoginPage = event.urlAfterRedirects === '/login';
       this.isMessagingPage = event.urlAfterRedirects.startsWith('/messaging');
       this.updateTitle();
@@ -239,6 +251,17 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /** Abre el diálogo de perfil desde la barra de navegación (Spec: "Mi perfil"). */
+  async openNotifications(): Promise<void> {
+    const { NotificationsPanelComponent } = await import('./features/notifications/notifications-panel.component');
+    this.dialog.open(NotificationsPanelComponent, {
+      width: '420px',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: 'calc(100dvh - 100px)',
+      position: { top: '80px', right: '16px' },
+      ariaLabel: 'Notificaciones',
+    });
+  }
+
   openProfile(): void {
     this.dialog.open(ProfileDialogComponent, {
       width: '520px',

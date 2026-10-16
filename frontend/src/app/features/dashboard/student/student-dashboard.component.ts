@@ -6,7 +6,6 @@ import { CourseService } from '@core/services/course.service';
 import { UserService } from '@core/services/user.service';
 import { TaskService } from '@core/services/task.service';
 import { AttendanceService } from '@core/services/attendance.service';
-import { UserNotificationsService, UserNotification } from '@core/services/user-notifications.service';
 import { NotificationService } from '@core/services/notification.service';
 import { Course } from '@core/models';
 import { JoinResultDialogComponent } from './join-result-dialog.component';
@@ -33,7 +32,6 @@ export class StudentDashboardComponent implements OnInit {
     private userService: UserService,
     private taskService: TaskService,
     private attendanceService: AttendanceService,
-    private userNotificationsService: UserNotificationsService,
     private notificationService: NotificationService,
     private dialog: MatDialog,
     private router: Router,
@@ -41,7 +39,6 @@ export class StudentDashboardComponent implements OnInit {
 
 attendanceCounts = { present: 0, absent: 0, late: 0, justified: 0 };
   courseAttendance: { courseName: string; present: number; absent: number; late: number; justified: number }[] = [];
-  notifications: UserNotification[] = [];
 
   get userCareer(): string {
     const u = this.authService.getCurrentUser();
@@ -50,26 +47,7 @@ attendanceCounts = { present: 0, absent: 0, late: 0, justified: 0 };
 
   ngOnInit() {
     this.loadStudentData();
-    this.loadNotifications();
     this.loadTeacherNames();
-  }
-
-  loadNotifications() {
-    this.userNotificationsService.getMine().subscribe({
-      next: (notifications) => {
-        this.notifications = notifications.filter(n => !n.read).slice(0, 5);
-      },
-      error: () => {},
-    });
-  }
-
-  dismissNotification(id: string) {
-    this.userNotificationsService.markRead(id).subscribe({
-      next: () => {
-        this.notifications = this.notifications.filter(n => n._id !== id);
-      },
-      error: () => {},
-    });
   }
 
   loadStudentData() {

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240" fill="none">
+  <defs><linearGradient id="sky" x2="0" y2="240" gradientUnits="userSpaceOnUse"><stop stop-color="#203e86" stop-opacity="0"/><stop offset=".6" stop-color="#3155ab"/><stop offset="1" stop-color="#122443"/></linearGradient><pattern id="windows" width="32" height="34" patternUnits="userSpaceOnUse"><path fill="#112b59" d="M7 6h19v23H7z"/><path stroke="#5576b0" stroke-opacity=".4" d="M17 6v23"/></pattern></defs>
+  <path fill="url(#sky)" d="M0 0h360v240H0z"/>
+  <path fill="#203d73" d="m0 118 106-55 205 33 49 30v91H0z"/>
+  <path fill="#3b5790" d="m106 63 205 33v110H106z"/>
+  <path fill="url(#windows)" d="M116 96h185v108H116zM5 130h91v74H5z"/>
+  <path stroke="#172d55" stroke-width="8" d="m0 118 106-55 205 33 49 30M106 63v147M0 154h106l205 10M0 186h106l205 9"/>
+  <path fill="#112c50" d="M0 206h360v34H0z"/><path stroke="#5073ad" stroke-opacity=".5" d="m0 224 360 6"/>
+  <g fill="#173f60"><path d="m23 165-17 42h34zm314-15-21 57h42zM74 177l-13 30h27z"/></g>
+</svg>

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { UserService } from '@core/services/user.service';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -32,6 +32,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private dialog: MatDialog,
     private router: Router,
+    private route: ActivatedRoute,
     private messagingStore: MessagingStore,
   ) {}
 
@@ -64,7 +65,11 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadUsers();
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      const role = params.get('role') || '';
+      this.selectedRole = Object.values(UserRole).includes(role as UserRole) ? role : '';
+      this.loadUsers();
+    });
   }
 
   loadUsers() {

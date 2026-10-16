@@ -1,77 +1,53 @@
-<mat-toolbar class="app-toolbar" *ngIf="!isLoginPage">
-  <div class="toolbar-content">
-    <div class="logo-section" (click)="goToDashboard()" role="link" tabindex="0" (keydown.enter)="goToDashboard()">
-      <img src="assets/logo.png" alt="IESTP Ciencias de la Salud" class="toolbar-logo" />
-      <div class="toolbar-title">
-        <h1>SIGA-ICS</h1>
-        <p class="subtitle">Servicio de Desarrollo de Clases</p>
+<div class="app-shell" [class.with-sidebar]="!isLoginPage && isAuthenticated">
+  <ng-container *ngIf="!isLoginPage && isAuthenticated">
+    <button class="sidebar-backdrop" *ngIf="sidebarOpen" (click)="sidebarOpen = false" aria-label="Cerrar menú"></button>
+    <aside class="app-sidebar" [class.is-open]="sidebarOpen" (keydown.escape)="sidebarOpen = false" aria-label="Menú principal">
+      <a class="sidebar-brand" [routerLink]="dashboardLink">
+        <img src="assets/logo.png" alt="Escudo del IESTP Ciencias de la Salud" />
+        <span><strong>SIGA-ICS</strong><small>Gestión Académica</small></span>
+      </a>
+      <button mat-icon-button class="sidebar-close" (click)="sidebarOpen = false" aria-label="Cerrar menú"><mat-icon>close</mat-icon></button>
+
+      <nav class="sidebar-nav" id="main-navigation" aria-label="Navegación principal">
+        <a class="nav-item" [routerLink]="dashboardLink" routerLinkActive="active" ariaCurrentWhenActive="page"><mat-icon>home</mat-icon><span>Dashboard</span></a>
+        <a class="nav-item" routerLink="/courses" routerLinkActive="active" ariaCurrentWhenActive="page"><mat-icon>menu_book</mat-icon><span>Cursos</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/users" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" ariaCurrentWhenActive="page" *ngIf="canManageUsers"><mat-icon>groups</mat-icon><span>Usuarios</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/users" [queryParams]="{role: 'docente'}" routerLinkActive="active" ariaCurrentWhenActive="page" *ngIf="canManageUsers"><mat-icon>person</mat-icon><span>Docentes</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/users" [queryParams]="{role: 'estudiante'}" routerLinkActive="active" ariaCurrentWhenActive="page" *ngIf="canManageUsers"><mat-icon>school</mat-icon><span>Estudiantes</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/surveys" routerLinkActive="active" ariaCurrentWhenActive="page"><mat-icon>bar_chart</mat-icon><span>Encuestas</span><span class="nav-badge" *ngIf="surveysStore.pendingSurveys() > 0">{{ surveysStore.pendingSurveys() }}</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/messaging" routerLinkActive="active" ariaCurrentWhenActive="page"><mat-icon>chat</mat-icon><span>Mensajería</span><span class="nav-badge" *ngIf="messagingStore.totalUnread() > 0">{{ messagingStore.totalUnread() }}</span><mat-icon class="nav-arrow">chevron_right</mat-icon></a>
+        <a class="nav-item" routerLink="/jobs" routerLinkActive="active" ariaCurrentWhenActive="page" *ngIf="canViewJobs && !canManageJobs"><mat-icon>work</mat-icon><span>Ofertas laborales</span><span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span></a>
+        <a class="nav-item" routerLink="/jobs/admin" routerLinkActive="active" ariaCurrentWhenActive="page" *ngIf="canManageJobs"><mat-icon>sell</mat-icon><span>{{ canViewJobs ? 'Gestionar Ofertas' : 'Registrar oferta' }}</span><span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span></a>
+
+        <div class="nav-divider"></div>
+        <button class="nav-item" (click)="settingsOpen = !settingsOpen" [attr.aria-expanded]="settingsOpen" aria-controls="sidebar-settings"><mat-icon>settings</mat-icon><span>Configuración</span><mat-icon class="nav-arrow">{{ settingsOpen ? 'expand_less' : 'expand_more' }}</mat-icon></button>
+        <div class="settings-menu" id="sidebar-settings" *ngIf="settingsOpen">
+          <button class="nav-item" (click)="openProfile(); sidebarOpen = false"><mat-icon>account_circle</mat-icon><span>Mi perfil</span></button>
+          <button class="nav-item" *ngIf="isAdmin" (click)="openTrash(); sidebarOpen = false"><mat-icon>delete_outline</mat-icon><span>Papelera</span></button>
+        </div>
+        <button class="nav-item" (click)="logout()"><mat-icon>logout</mat-icon><span>Cerrar Sesión</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="campus-art" aria-hidden="true"></div>
+        <strong>SIGA-ICS</strong>
+        <p>“Comprometidos con la educación”</p>
       </div>
-    </div>
+    </aside>
 
-    <nav class="nav-menu" *ngIf="isAuthenticated">
-      <div class="nav-user-greeting">
-        <span class="greeting-role">{{ roleLabel }}</span>
-        <strong class="greeting-name">{{ userName }}</strong>
-      </div>
-      <button mat-button matTooltip="Dashboard" [routerLink]="['/dashboard', isAdmin ? 'admin' : 'teacher']"
-        routerLinkActive="active">
-        <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
+    <header class="workspace-header">
+      <button mat-icon-button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen" [attr.aria-expanded]="sidebarOpen" aria-controls="main-navigation" aria-label="Abrir menú"><mat-icon>menu</mat-icon></button>
+      <span class="workspace-label">Plataforma Virtual</span>
+      <button mat-icon-button class="notifications-button" (click)="openNotifications()" matTooltip="Notificaciones" [attr.aria-label]="'Notificaciones: ' + notificationsStore.unreadCount() + ' sin leer'" aria-haspopup="dialog">
+        <mat-icon>notifications_none</mat-icon>
+        <span class="notifications-count" *ngIf="notificationsStore.unreadCount() > 0">{{ notificationsStore.unreadCount() > 99 ? '99+' : notificationsStore.unreadCount() }}</span>
       </button>
-      <button mat-button matTooltip="Cursos" routerLink="/courses" routerLinkActive="active">
-        <mat-icon>school</mat-icon>
-        <span>Cursos</span>
+      <button class="user-profile" (click)="openProfile()" aria-label="Abrir mi perfil">
+        <span><strong>{{ userName }}</strong><small>{{ roleLabel }}</small></span><mat-icon>account_circle</mat-icon>
       </button>
-      <button mat-button matTooltip="Usuarios" routerLink="/users" routerLinkActive="active" *ngIf="isAdmin">
-        <mat-icon>people</mat-icon>
-        <span>Usuarios</span>
-      </button>
-      <button mat-button matTooltip="Encuestas" routerLink="/surveys" routerLinkActive="active">
-        <mat-icon>poll</mat-icon>
-        <span>Encuestas</span>
-        <span class="nav-badge" *ngIf="surveysStore.pendingSurveys() > 0">{{ surveysStore.pendingSurveys() }}</span>
-      </button>
-      <button mat-button matTooltip="Mensajería" routerLink="/messaging" routerLinkActive="active">
-        <mat-icon>chat</mat-icon>
-        <span>Mensajería</span>
-        <span class="nav-badge" *ngIf="messagingStore.totalUnread() > 0">{{ messagingStore.totalUnread() }}</span>
-      </button>
-      <button mat-button matTooltip="Ofertas laborales" routerLink="/jobs" routerLinkActive="active"
-        *ngIf="canViewJobs && !canManageJobs">
-        <mat-icon>work</mat-icon>
-        <span>Ofertas</span>
-        <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
-      </button>
-      <button mat-button matTooltip="Gestionar ofertas" routerLink="/jobs/admin" routerLinkActive="active"
-        *ngIf="canManageJobs">
-        <mat-icon>admin_panel_settings</mat-icon>
-        <span>{{ canViewJobs ? 'Gestionar Ofertas' : 'Registrar oferta' }}</span>
-        <span class="nav-badge" *ngIf="jobsStore.activeOfferCount() > 0">{{ jobsStore.activeOfferCount() }}</span>
-      </button>
-      <button mat-button matTooltip="Cerrar sesión" (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Cerrar Sesión</span>
-      </button>
-    </nav>
-  </div>
-</mat-toolbar>
+    </header>
+  </ng-container>
 
-<button mat-fab color="primary" class="profile-fab" *ngIf="isAuthenticated && !isLoginPage && !isMessagingPage"
-  (click)="openProfile()" matTooltip="Mi perfil" aria-label="Mi perfil">
-  <mat-icon>account_circle</mat-icon>
-</button>
-
-<button mat-fab class="trash-fab" *ngIf="isAdmin && !isLoginPage && !isMessagingPage" (click)="openTrash()"
-  matTooltip="Papelera" aria-label="Papelera">
-  <mat-icon>delete</mat-icon>
-</button>
-
-<main class="app-main" [class.login-main]="isLoginPage">
-  <router-outlet></router-outlet>
-</main>
-
-<footer class="app-footer" *ngIf="!isLoginPage">
-  <div class="footer-content">
-    <p>© 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.</p>
-  </div>
-</footer>
+  <main class="app-main" [class.login-main]="isLoginPage"><router-outlet></router-outlet></main>
+  <footer class="app-footer" *ngIf="!isLoginPage">© 2026 IESTP Ciencias de la Salud - Pucallpa. Todos los derechos reservados.</footer>
+</div>
