@@ -176,20 +176,28 @@
           <!-- Semanas existentes -->
           <div *ngIf="course.weeks && course.weeks.length > 0" class="weeks-accordion">
             <mat-expansion-panel *ngFor="let week of course.weeks; let wi = index" class="week-panel">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon class="week-icon">calendar_view_week</mat-icon>
-                  <strong>Semana {{ week.number }}: {{ week.title }}</strong>
+              <mat-expansion-panel-header class="week-header">
+                <mat-panel-title class="week-title">
+                  <span class="week-icon-badge">
+                    <mat-icon class="week-icon">calendar_view_week</mat-icon>
+                  </span>
+                  <span class="week-heading">
+                    <strong class="week-name">Semana {{ week.number }}</strong>
+                    <span class="week-subtitle" *ngIf="week.title && week.title !== 'Semana ' + week.number">{{ week.title }}</span>
+                  </span>
                 </mat-panel-title>
                 <mat-panel-description class="week-panel-desc">
-                  <span *ngIf="week.createdAt">Creada: {{ week.createdAt | date:'short' }}</span>
+                  <span class="week-created" *ngIf="week.createdAt">
+                    <mat-icon>schedule</mat-icon>
+                    {{ week.createdAt | date:'short' }}
+                  </span>
                   <span *ngIf="sessionCountdowns[wi]" class="session-countdown">{{ sessionCountdowns[wi] }}</span>
                 </mat-panel-description>
                 <div class="week-flat-actions" *ngIf="isTeacherOrAdmin" (click)="$event.stopPropagation()">
-                  <button mat-icon-button color="primary" (click)="editWeek(wi)" aria-label="Editar semana">
+                  <button mat-icon-button color="primary" (click)="editWeek(wi)" aria-label="Editar semana" matTooltip="Editar semana">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button mat-icon-button color="warn" (click)="deleteWeek(wi)" aria-label="Eliminar semana">
+                  <button mat-icon-button color="warn" (click)="deleteWeek(wi)" aria-label="Eliminar semana" matTooltip="Eliminar semana">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
@@ -197,13 +205,17 @@
 
               <!-- Sesión -->
               <mat-expansion-panel class="week-sub-panel" [expanded]="true">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon class="sub-panel-icon">event</mat-icon> Sesión
+                <mat-expansion-panel-header class="sub-header">
+                  <mat-panel-title class="sub-title">
+                    <span class="sub-icon-badge"><mat-icon class="sub-panel-icon">event</mat-icon></span>
+                    <span class="sub-name">Sesión</span>
                   </mat-panel-title>
-                  <mat-panel-description>
-                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openSessionCreate(wi); $event.stopPropagation()">
-                      <mat-icon>add</mat-icon> Agregar Sesión
+                  <mat-panel-description class="sub-desc">
+                    <button mat-stroked-button color="primary" class="sub-add-btn" *ngIf="isTeacherOrAdmin"
+                      (click)="openSessionCreate(wi); $event.stopPropagation()"
+                      aria-label="Agregar sesión" matTooltip="Agregar sesión">
+                      <mat-icon>add</mat-icon>
+                      <span class="add-label">Agregar sesión</span>
                     </button>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
@@ -233,13 +245,18 @@
 
               <!-- Materiales -->
               <mat-expansion-panel class="week-sub-panel">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon class="sub-panel-icon">folder_open</mat-icon> Materiales ({{ week.materials?.length || 0 }})
+                <mat-expansion-panel-header class="sub-header">
+                  <mat-panel-title class="sub-title">
+                    <span class="sub-icon-badge"><mat-icon class="sub-panel-icon">folder_open</mat-icon></span>
+                    <span class="sub-name">Materiales</span>
+                    <span class="sub-count">{{ week.materials?.length || 0 }}</span>
                   </mat-panel-title>
-                  <mat-panel-description>
-                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openMaterialCreate(wi); $event.stopPropagation()">
-                      <mat-icon>add</mat-icon> Nuevo Material
+                  <mat-panel-description class="sub-desc">
+                    <button mat-stroked-button color="primary" class="sub-add-btn" *ngIf="isTeacherOrAdmin"
+                      (click)="openMaterialCreate(wi); $event.stopPropagation()"
+                      aria-label="Nuevo material" matTooltip="Nuevo material">
+                      <mat-icon>add</mat-icon>
+                      <span class="add-label">Nuevo material</span>
                     </button>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
@@ -272,13 +289,18 @@
 
               <!-- Tareas -->
               <mat-expansion-panel class="week-sub-panel">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon class="sub-panel-icon">assignment</mat-icon> Tareas ({{ getWeekTasks(week.number).length }})
+                <mat-expansion-panel-header class="sub-header">
+                  <mat-panel-title class="sub-title">
+                    <span class="sub-icon-badge"><mat-icon class="sub-panel-icon">assignment</mat-icon></span>
+                    <span class="sub-name">Tareas</span>
+                    <span class="sub-count">{{ getWeekTasks(week.number).length }}</span>
                   </mat-panel-title>
-                  <mat-panel-description>
-                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openTaskCreate(wi); $event.stopPropagation()">
-                      <mat-icon>add</mat-icon> Nueva Tarea
+                  <mat-panel-description class="sub-desc">
+                    <button mat-stroked-button color="primary" class="sub-add-btn" *ngIf="isTeacherOrAdmin"
+                      (click)="openTaskCreate(wi); $event.stopPropagation()"
+                      aria-label="Nueva tarea" matTooltip="Nueva tarea">
+                      <mat-icon>add</mat-icon>
+                      <span class="add-label">Nueva tarea</span>
                     </button>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
@@ -303,13 +325,18 @@
 
               <!-- Exámenes -->
               <mat-expansion-panel class="week-sub-panel">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon class="sub-panel-icon">quiz</mat-icon> Pasitos · Exámenes ({{ getWeekExams(week.number).length }})
+                <mat-expansion-panel-header class="sub-header">
+                  <mat-panel-title class="sub-title">
+                    <span class="sub-icon-badge"><mat-icon class="sub-panel-icon">quiz</mat-icon></span>
+                    <span class="sub-name">Pasitos · Exámenes</span>
+                    <span class="sub-count">{{ getWeekExams(week.number).length }}</span>
                   </mat-panel-title>
-                  <mat-panel-description>
-                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openExamCreate(week.number); $event.stopPropagation()">
-                      <mat-icon>add</mat-icon> Nuevo Examen
+                  <mat-panel-description class="sub-desc">
+                    <button mat-stroked-button color="primary" class="sub-add-btn" *ngIf="isTeacherOrAdmin"
+                      (click)="openExamCreate(week.number); $event.stopPropagation()"
+                      aria-label="Nuevo examen" matTooltip="Nuevo examen">
+                      <mat-icon>add</mat-icon>
+                      <span class="add-label">Nuevo examen</span>
                     </button>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
@@ -349,13 +376,18 @@
 
               <!-- Foros -->
               <mat-expansion-panel class="week-sub-panel">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    <mat-icon class="sub-panel-icon">forum</mat-icon> Foros ({{ getWeekForums(week.number).length }})
+                <mat-expansion-panel-header class="sub-header">
+                  <mat-panel-title class="sub-title">
+                    <span class="sub-icon-badge"><mat-icon class="sub-panel-icon">forum</mat-icon></span>
+                    <span class="sub-name">Foros</span>
+                    <span class="sub-count">{{ getWeekForums(week.number).length }}</span>
                   </mat-panel-title>
-                  <mat-panel-description>
-                    <button mat-stroked-button color="primary" *ngIf="isTeacherOrAdmin" (click)="openForumCreate(week.number); $event.stopPropagation()">
-                      <mat-icon>add</mat-icon> Nuevo Foro
+                  <mat-panel-description class="sub-desc">
+                    <button mat-stroked-button color="primary" class="sub-add-btn" *ngIf="isTeacherOrAdmin"
+                      (click)="openForumCreate(week.number); $event.stopPropagation()"
+                      aria-label="Nuevo foro" matTooltip="Nuevo foro">
+                      <mat-icon>add</mat-icon>
+                      <span class="add-label">Nuevo foro</span>
                     </button>
                   </mat-panel-description>
                 </mat-expansion-panel-header>
