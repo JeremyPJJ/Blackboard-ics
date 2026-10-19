@@ -4,15 +4,20 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
+import { NotificationsStore } from '@core/services/notifications.store';
 import { CourseService } from '@core/services/course.service';
 import { Course } from '@core/models';
 import { ProfileService } from '../services/profile.service';
 import { ProfileStore } from '../store/profile.store';
 
+/** Pestañas del perfil: datos, seguridad (contraseña) y notificaciones. */
+type ProfileTab = 'info' | 'password' | 'notifications';
+
 /**
  * Diálogo de perfil accesible desde la barra de navegación ("Mi perfil").
- * Muestra los datos del usuario y un formulario de cambio de contraseña
- * self-service (Spec: Profile UI — "Open profile").
+ * Muestra los datos reales del usuario (nombre, correo, rol) y organiza el
+ * contenido en tres pestañas: Información personal, Seguridad (cambio de
+ * contraseña self-service) y Notificaciones (acceso al panel existente).
  *
  * Flujo post-éxito: el backend revoca TODOS los refresh tokens del usuario
  * (decisión del diseño → fuerza re-login en todos los dispositivos), así que la
@@ -31,6 +36,19 @@ export class ProfileDialogComponent implements OnInit {
   courses: Course[] = [];
   coursesLoading = false;
 
+  /** Pestaña activa del perfil (siempre inicia en información personal). */
+  activeTab: ProfileTab = 'info';
+
+  /** Visibilidad de cada campo de contraseña (ojo). */
+  showCurrentPassword = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
+
+  /** Segmentos del medidor de seguridad. */
+  readonly strengthSegments = [1, 2, 3, 4];
+
+  private readonly strengthLabels = ['—', 'Débil', 'Media', 'Buena', 'Fuerte'];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -40,6 +58,7 @@ export class ProfileDialogComponent implements OnInit {
     private router: Router,
     public store: ProfileStore,
     public dialogRef: MatDialogRef<ProfileDialogComponent>,
+    public notificationsStore: NotificationsStore,
     private dialog: MatDialog,
   ) {
     this.passwordForm = this.fb.group(
@@ -54,8 +73,10 @@ export class ProfileDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.reset();
+    this.activeTab = 'info';
     this.loadProfile();
     this.loadCourses();
+    this.notificationsStore.load();
   }
 
   /** super_admin no lleva cursos (Spec N1): no ve la sección, ve empty-state. */
@@ -96,8 +117,8 @@ export class ProfileDialogComponent implements OnInit {
   }
 
   /**
-   * Abre el panel de notificaciones como dialog (Spec N2 — el navbar ya no tiene
-   * campana; el acceso vive en el perfil). Carga lazy, chunk < 500KB.
+   * Abre el panel de notificaciones como dialog desde la pestaña
+   * "Notificaciones" del perfil. Carga lazy, chunk < 500KB.
    */
   async openNotifications(): Promise<void> {
     const { NotificationsPanelComponent } = await import(
@@ -112,6 +133,59 @@ export class ProfileDialogComponent implements OnInit {
 
   get user() {
     return this.store.user();
+  }
+
+  /** Etiqueta legible del rol, consistente con la barra superior. */
+  get roleLabel(): string {
+    const labels: Record<string, string> = {
+      super_admin: 'Administrador',
+      unidad_academica: 'Unidad Académica',
+      secretaria: 'Secretaría',
+      soporte: 'Soporte Técnico',
+      docente: 'Docente',
+      estudiante: 'Estudiante',
+    };
+    return labels[this.user?.role || ''] || 'Usuario';
+  }
+
+  /**
+   * Medidor de seguridad (0-4) de la nueva contraseña: longitud mínima,
+   * letra, número y carácter especial.
+   */
+  get passwordStrength(): { score: number; label: string } {
+    const value: string = this.passwordForm.get('newPassword')?.value || '';
+    if (!value) return { score: 0, label: this.strengthLabels[0] };
+
+    let criteria = 0;
+    if (value.length >= 8) criteria++;
+    if (/[a-zA-Z]/.test(value)) criteria++;
+    if (/\d/.test(value)) criteria++;
+    if (/[^a-zA-Z0-9]/.test(value)) criteria++;
+
+    const score = Math.max(1, Math.min(criteria, 4));
+    return { score, label: this.strengthLabels[score] };
+  }
+
+  /** Índice de la pestaña activa para mat-tab-group (0: info, 1: seguridad, 2: notificaciones). */
+  get tabIndex(): number {
+    switch (this.activeTab) {
+      case 'password':
+        return 1;
+      case 'notifications':
+        return 2;
+      default:
+        return 0;
+    }
+  }
+
+  onTabChange(index: number): void {
+    this.activeTab = index === 1 ? 'password' : index === 2 ? 'notifications' : 'info';
+  }
+
+  togglePasswordVisibility(field: 'current' | 'new' | 'confirm'): void {
+    if (field === 'current') this.showCurrentPassword = !this.showCurrentPassword;
+    if (field === 'new') this.showNewPassword = !this.showNewPassword;
+    if (field === 'confirm') this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   get submitting() {

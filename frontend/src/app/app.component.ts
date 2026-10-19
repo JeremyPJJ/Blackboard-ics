@@ -264,7 +264,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   openProfile(): void {
     this.dialog.open(ProfileDialogComponent, {
-      width: '520px',
+      width: '860px',
       maxWidth: 'calc(100vw - 24px)',
       maxHeight: 'calc(100dvh - 24px)',
       disableClose: true,

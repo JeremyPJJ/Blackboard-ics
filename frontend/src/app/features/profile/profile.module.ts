@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 import { ProfileDialogComponent } from './profile-dialog/profile-dialog.component';
 
 /**
@@ -31,6 +32,7 @@ import { ProfileDialogComponent } from './profile-dialog/profile-dialog.componen
     MatCardModule,
     MatDividerModule,
     MatProgressSpinnerModule,
+    MatTabsModule,
   ],
   exports: [ProfileDialogComponent],
 })

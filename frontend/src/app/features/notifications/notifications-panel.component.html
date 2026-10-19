@@ -1,7 +1,20 @@
-<h2 mat-dialog-title>
-  <mat-icon>notifications</mat-icon>
-  Notificaciones
-  <span class="unread-count" *ngIf="unreadCount() > 0">{{ unreadCount() }}</span>
+<h2 mat-dialog-title class="panel-header">
+  <span class="header-icon">
+    <mat-icon>notifications</mat-icon>
+  </span>
+  <span class="header-text">
+    <span class="header-title">Notificaciones</span>
+    <span class="header-subtitle">{{ headerSubtitle() }}</span>
+  </span>
+  <button
+    type="button"
+    class="mark-all-btn"
+    *ngIf="unreadCount() > 0"
+    (click)="markAllRead()"
+  >
+    <mat-icon>done</mat-icon>
+    <span>Marcar todas como leídas</span>
+  </button>
 </h2>
 
 <mat-dialog-content class="panel-content">
@@ -10,39 +23,52 @@
   </div>
 
   <div *ngIf="!loading() && notifications().length === 0" class="panel-empty">
-    <mat-icon>notifications_none</mat-icon>
-    <p>No tienes notificaciones</p>
+    <span class="empty-icon"><mat-icon>notifications_off</mat-icon></span>
+    <p class="empty-title">No tienes notificaciones</p>
+    <p class="empty-hint">Cuando recibas un mensaje o una novedad aparecerá aquí.</p>
   </div>
 
-  <div class="notification-item" *ngFor="let notification of notifications()">
-    <div class="notification-icon">
-      <mat-icon>{{ iconFor(notification.type) }}</mat-icon>
-    </div>
-    <div class="notification-body">
-      <span class="notification-title">{{ notification.title }}</span>
-      <span class="notification-message" *ngIf="notification.message">
-        {{ notification.message }}
-      </span>
-      <span class="notification-time">
-        {{ notification.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-      </span>
-    </div>
-    <button
-      type="button"
-      class="read-btn"
-      (click)="markRead(notification._id)"
-      matTooltip="Marcar como leída"
-      aria-label="Marcar como leída"
-      *ngIf="!notification.read"
+  <div class="notif-group" *ngFor="let group of groups(); trackBy: trackGroup">
+    <div class="group-label" *ngIf="group.label">{{ group.label }}</div>
+
+    <div
+      class="notification-item"
+      *ngFor="let notification of group.items; trackBy: trackById"
+      [class.is-unread]="!notification.read"
+      [class.is-read]="notification.read"
+      [attr.role]="notification.read ? null : 'button'"
+      [attr.tabindex]="notification.read ? null : 0"
+      [attr.aria-label]="notification.read ? null : 'Marcar como leída: ' + notification.title"
+      (click)="markRead(notification)"
+      (keydown.enter)="markRead(notification)"
+      (keydown.space)="markRead(notification, $event)"
     >
-      <mat-icon>done</mat-icon>
-    </button>
+      <span class="notification-icon">
+        <mat-icon>{{ iconFor(notification.type) }}</mat-icon>
+      </span>
+      <span class="notification-body">
+        <span class="notification-top">
+          <span class="notification-title">{{ notification.title }}</span>
+          <span
+            class="notification-time"
+            [attr.title]="notification.createdAt | date: 'dd/MM/yyyy HH:mm'"
+          >
+            {{ timeLabel(notification.createdAt) }}
+          </span>
+        </span>
+        <span class="notification-message" *ngIf="notification.message">
+          {{ notification.message }}
+        </span>
+      </span>
+      <span class="unread-dot" *ngIf="!notification.read"></span>
+    </div>
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" *ngIf="unreadCount() > 0">
-  <button mat-button (click)="markAllRead()">
-    <mat-icon>done_all</mat-icon>
-    Marcar todas como leídas
+<mat-dialog-actions class="panel-actions">
+  <button type="button" class="view-all-btn" (click)="viewAll()">
+    <mat-icon>chat_bubble_outline</mat-icon>
+    <span>Ver todas las notificaciones</span>
+    <mat-icon class="chevron">chevron_right</mat-icon>
   </button>
 </mat-dialog-actions>

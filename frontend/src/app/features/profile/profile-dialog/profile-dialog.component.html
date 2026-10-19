@@ -1,100 +1,231 @@
-<h2 mat-dialog-title>Mi perfil</h2>
+<div class="dialog-header">
+  <div class="header-titles">
+    <h2 mat-dialog-title>Mi perfil</h2>
+    <p class="dialog-subtitle">Gestiona tu información personal y seguridad.</p>
+  </div>
+  <button mat-icon-button type="button" class="close-button" (click)="onCancel()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
 
 <mat-dialog-content>
-  <!-- Datos del usuario (Spec: muestra datos del perfil) -->
-  <div class="profile-info" *ngIf="user">
-    <div class="profile-row">
-      <span class="profile-label">Nombre</span>
-      <span class="profile-value">{{ user.names }} {{ user.lastNames }}</span>
+  <!-- Tarjeta del usuario -->
+  <div class="user-card" *ngIf="user">
+    <div class="user-avatar">
+      <img *ngIf="user.photo" [src]="user.photo" [alt]="user.names + ' ' + user.lastNames" />
+      <mat-icon *ngIf="!user.photo">person</mat-icon>
     </div>
-    <div class="profile-row">
-      <span class="profile-label">Correo</span>
-      <span class="profile-value">{{ user.institutionalEmail }}</span>
+    <div class="user-data">
+      <div class="user-line">
+        <span class="user-name">{{ user.names }} {{ user.lastNames }}</span>
+        <span class="role-badge">{{ roleLabel }}</span>
+      </div>
+      <div class="user-email">
+        <mat-icon>mail_outline</mat-icon>
+        <span>{{ user.institutionalEmail }}</span>
+      </div>
     </div>
-    <div class="profile-row" *ngIf="user.role">
-      <span class="profile-label">Rol</span>
-      <span class="profile-value">{{ user.role }}</span>
-    </div>
-    <mat-divider></mat-divider>
   </div>
 
-  <!-- Mis notificaciones (Spec N2: el navbar ya no tiene campana) -->
-  <button mat-button class="notifications-link" (click)="openNotifications()">
-    <mat-icon>notifications</mat-icon>
-    <span>Mis notificaciones</span>
-  </button>
-  <mat-divider></mat-divider>
+  <mat-tab-group
+    class="profile-tabs"
+    [selectedIndex]="tabIndex"
+    (selectedIndexChange)="onTabChange($event)"
+    [mat-stretch-tabs]="false"
+    animationDuration="200ms"
+  >
+    <!-- Información personal -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">person_outline</mat-icon>
+        <span>Información personal</span>
+      </ng-template>
 
-  <!-- Mis cursos (Spec O8: docente → a cargo; staff → activos) -->
-  <div class="profile-courses" *ngIf="showCoursesSection">
-    <h3 class="section-title">Mis cursos</h3>
-    <mat-spinner *ngIf="coursesLoading" diameter="20" class="button-spinner"></mat-spinner>
-    <ng-container *ngIf="!coursesLoading">
-      <div class="course-item" *ngFor="let course of courses">
-        <button mat-button class="course-link" (click)="goToCourse(course._id)">
-          <mat-icon>school</mat-icon>
-          <span>{{ course.name }}</span>
+      <div class="tab-panel" *ngIf="user">
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label">Nombre completo</span>
+            <span class="info-value">{{ user.names }} {{ user.lastNames }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Correo institucional</span>
+            <span class="info-value">{{ user.institutionalEmail }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Rol</span>
+            <span class="info-value">{{ roleLabel }}</span>
+          </div>
+          <div class="info-row" *ngIf="user.dni">
+            <span class="info-label">DNI</span>
+            <span class="info-value">{{ user.dni }}</span>
+          </div>
+          <div class="info-row" *ngIf="user.personalEmail">
+            <span class="info-label">Correo personal</span>
+            <span class="info-value">{{ user.personalEmail }}</span>
+          </div>
+          <div class="info-row" *ngIf="user.phone">
+            <span class="info-label">Teléfono</span>
+            <span class="info-value">{{ user.phone }}</span>
+          </div>
+        </div>
+
+        <!-- Mis cursos (Spec O8: docente → a cargo; staff → activos) -->
+        <div class="courses-block" *ngIf="showCoursesSection">
+          <h4>Mis cursos</h4>
+          <mat-spinner *ngIf="coursesLoading" diameter="20" class="button-spinner"></mat-spinner>
+          <ng-container *ngIf="!coursesLoading">
+            <button type="button" class="course-link" *ngFor="let course of courses" (click)="goToCourse(course._id)">
+              <mat-icon>school</mat-icon>
+              <span>{{ course.name }}</span>
+            </button>
+            <p *ngIf="courses.length === 0" class="courses-empty">Sin cursos</p>
+          </ng-container>
+        </div>
+
+        <!-- super_admin no lleva cursos (Spec N1) -->
+        <p *ngIf="isSuperAdmin" class="courses-empty">Los administradores no tienen cursos asignados</p>
+      </div>
+    </mat-tab>
+
+    <!-- Seguridad -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">lock_outline</mat-icon>
+        <span>Seguridad</span>
+      </ng-template>
+
+      <div class="tab-panel">
+        <p class="tab-intro">Actualiza tu contraseña para mantener tu cuenta segura.</p>
+
+        <!-- Mensaje de éxito -->
+        <mat-card class="result-card success-card" *ngIf="success">
+          <p>{{ success }}</p>
+        </mat-card>
+
+        <!-- Error (401 contraseña actual incorrecta / 400 validación / 429 rate-limit) -->
+        <mat-card class="result-card error-card" *ngIf="error">
+          <p>{{ error }}</p>
+        </mat-card>
+
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="password-form">
+          <label class="field-label" for="profile-current-password">
+            Contraseña actual <span class="required">*</span>
+          </label>
+          <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+            <mat-icon matPrefix class="field-icon">lock_outline</mat-icon>
+            <input id="profile-current-password" matInput [type]="showCurrentPassword ? 'text' : 'password'"
+              formControlName="currentPassword" placeholder="Ingresa tu contraseña actual"
+              autocomplete="current-password" />
+            <button mat-icon-button matSuffix type="button" class="toggle-visibility"
+              (click)="togglePasswordVisibility('current')"
+              [attr.aria-label]="showCurrentPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              <mat-icon>{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+              Ingresa tu contraseña actual
+            </mat-error>
+          </mat-form-field>
+
+          <label class="field-label" for="profile-new-password">
+            Nueva contraseña <span class="required">*</span>
+          </label>
+          <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+            <mat-icon matPrefix class="field-icon">lock_outline</mat-icon>
+            <input id="profile-new-password" matInput [type]="showNewPassword ? 'text' : 'password'"
+              formControlName="newPassword" placeholder="Ingresa tu nueva contraseña"
+              autocomplete="new-password" />
+            <button mat-icon-button matSuffix type="button" class="toggle-visibility"
+              (click)="togglePasswordVisibility('new')"
+              [attr.aria-label]="showNewPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              <mat-icon>{{ showNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+              Ingresa la nueva contraseña
+            </mat-error>
+            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+              Debe tener al menos 8 caracteres
+            </mat-error>
+          </mat-form-field>
+
+          <div class="strength-meter" [ngClass]="'level-' + passwordStrength.score">
+            <div class="strength-bars">
+              <span class="strength-bar" *ngFor="let segment of strengthSegments"
+                [class.filled]="passwordStrength.score >= segment"></span>
+            </div>
+            <span class="strength-text">Seguridad: {{ passwordStrength.label }}</span>
+          </div>
+
+          <div class="rule-hint">
+            <mat-icon>info</mat-icon>
+            <span>Mínimo 8 caracteres, al menos una letra y un número.</span>
+          </div>
+
+          <label class="field-label" for="profile-confirm-password">
+            Confirmar nueva contraseña <span class="required">*</span>
+          </label>
+          <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+            <mat-icon matPrefix class="field-icon">lock_outline</mat-icon>
+            <input id="profile-confirm-password" matInput [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword" placeholder="Vuelve a ingresar tu nueva contraseña"
+              autocomplete="new-password" />
+            <button mat-icon-button matSuffix type="button" class="toggle-visibility"
+              (click)="togglePasswordVisibility('confirm')"
+              [attr.aria-label]="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+              Las contraseñas no coinciden
+            </mat-error>
+          </mat-form-field>
+        </form>
+      </div>
+    </mat-tab>
+
+    <!-- Notificaciones -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">notifications_none</mat-icon>
+        <span>Notificaciones</span>
+      </ng-template>
+
+      <div class="tab-panel">
+        <p class="tab-intro">Consulta los avisos y mensajes que has recibido en la plataforma.</p>
+
+        <button type="button" class="notifications-option" (click)="openNotifications()">
+          <span class="option-icon">
+            <mat-icon>notifications_none</mat-icon>
+          </span>
+          <span class="option-text">
+            <span class="option-title">Mis notificaciones</span>
+            <span class="option-subtitle">
+              {{ notificationsStore.unreadCount() > 0 ? notificationsStore.unreadCount() + ' sin leer' : 'Estás al día' }}
+            </span>
+          </span>
+          <span class="option-badge" *ngIf="notificationsStore.unreadCount() > 0">
+            {{ notificationsStore.unreadCount() > 99 ? '99+' : notificationsStore.unreadCount() }}
+          </span>
+          <mat-icon class="option-arrow">chevron_right</mat-icon>
         </button>
       </div>
-      <p *ngIf="courses.length === 0" class="courses-empty">Sin cursos</p>
-    </ng-container>
-    <mat-divider></mat-divider>
-  </div>
-
-  <!-- super_admin no lleva cursos (Spec N1): empty-state explicativo, sin "Mis cursos" -->
-  <div class="profile-courses" *ngIf="isSuperAdmin">
-    <p class="courses-empty">Los administradores no tienen cursos asignados</p>
-    <mat-divider></mat-divider>
-  </div>
-
-  <h3 class="section-title">Cambiar contraseña</h3>
-
-  <!-- Mensaje de éxito -->
-  <mat-card class="result-card success-card" *ngIf="success">
-    <p>{{ success }}</p>
-  </mat-card>
-
-  <!-- Error (401 contraseña actual incorrecta / 400 validación / 429 rate-limit) -->
-  <mat-card class="result-card error-card" *ngIf="error">
-    <p>{{ error }}</p>
-  </mat-card>
-
-  <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()" class="password-form">
-    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
-      <mat-label>Contraseña actual</mat-label>
-      <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
-      <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
-        Ingresa tu contraseña actual
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
-      <mat-label>Nueva contraseña</mat-label>
-      <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
-      <mat-hint>Mínimo 8 caracteres, al menos una letra y un número.</mat-hint>
-      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
-        Ingresa la nueva contraseña
-      </mat-error>
-      <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
-        Debe tener al menos 8 caracteres
-      </mat-error>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
-      <mat-label>Confirmar nueva contraseña</mat-label>
-      <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
-      <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
-        Las contraseñas no coinciden
-      </mat-error>
-    </mat-form-field>
-  </form>
+    </mat-tab>
+  </mat-tab-group>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="onCancel()" [disabled]="submitting">Cancelar</button>
-  <button mat-raised-button color="primary" type="submit" (click)="onChangePassword()"
-    [disabled]="passwordForm.invalid || submitting">
-    <mat-spinner *ngIf="submitting" diameter="18" class="button-spinner"></mat-spinner>
-    <span *ngIf="!submitting">Cambiar contraseña</span>
+  <ng-container *ngIf="activeTab === 'password'">
+    <button mat-stroked-button type="button" class="cancel-button" (click)="onCancel()" [disabled]="submitting">
+      Cancelar
+    </button>
+    <button mat-flat-button color="primary" type="button" class="submit-button" (click)="onChangePassword()"
+      [disabled]="passwordForm.invalid || submitting">
+      <mat-spinner *ngIf="submitting" diameter="18" class="button-spinner"></mat-spinner>
+      <ng-container *ngIf="!submitting">
+        <mat-icon>lock</mat-icon>
+        <span>Cambiar contraseña</span>
+      </ng-container>
+    </button>
+  </ng-container>
+  <button mat-stroked-button *ngIf="activeTab !== 'password'" type="button" class="cancel-button" (click)="onCancel()">
+    Cerrar
   </button>
 </mat-dialog-actions>
