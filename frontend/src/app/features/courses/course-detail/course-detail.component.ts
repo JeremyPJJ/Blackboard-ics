@@ -521,7 +521,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         height: 'calc(100dvh - 32px)',
         maxWidth: '96vw',
         maxHeight: '94dvh',
-        data: { fileId: mat.fileId, title: mat.title || 'Archivo' },
+        data: { fileId: mat.fileId, title: mat.title || 'Archivo', fileType: mat.type },
       });
     }
   }
@@ -548,13 +548,17 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: MaterialEditResult | undefined) => {
       if (!result) return;
+      let handled = false;
+      const previousFileId = material.fileId;
       const apply = (fileId?: string) => {
+        if (handled) return;
+        handled = true;
         material.title = result.title;
         material.description = result.description;
         material.type = result.type;
         material.url = result.url;
         if (fileId) material.fileId = fileId;
-        this.saveWeeks(weeks, 'Material actualizado');
+        this.saveWeeks(weeks, 'Material actualizado', () => this.removeReplacedFile(previousFileId, fileId));
       };
       if (result.file) {
         this.fileService.upload(result.file, 'course_material', this.courseId).subscribe({
@@ -585,13 +589,17 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         this.notificationService.warning('La sesión solo acepta PDF o Documento');
         return;
       }
+      let handled = false;
+      const previousFileId = material.fileId;
       const apply = (fileId?: string) => {
+        if (handled) return;
+        handled = true;
         material.title = result.title;
         material.description = result.description;
         material.type = result.type;
         material.url = result.url;
         if (fileId) material.fileId = fileId;
-        this.saveWeeks(weeks, 'Sesión actualizada');
+        this.saveWeeks(weeks, 'Sesión actualizada', () => this.removeReplacedFile(previousFileId, fileId));
       };
       if (result.file) {
         this.fileService.upload(result.file, 'course_material', this.courseId).subscribe({
@@ -940,17 +948,34 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     return session?.materials?.[0] || null;
   }
 
-  private saveWeeks(weeks: any[], successMsg: string) {
+  private saveWeeks(weeks: any[], successMsg: string, onSaved?: () => void) {
     this.courseService.updateCourse(this.courseId, { weeks }).subscribe({
       next: (course) => {
         this.course = course;
         this.startSessionCountdowns();
         this.notificationService.success(successMsg);
+        onSaved?.();
       },
       error: (error) => {
         console.error('Error saving weeks:', error);
         this.notificationService.error(error.error?.message || 'Error al guardar los cambios');
       },
+    });
+  }
+
+  private removeReplacedFile(previousFileId?: string, newFileId?: string): void {
+    if (!previousFileId || !newFileId || previousFileId === newFileId) return;
+    const weeks = this.course?.weeks || [];
+    const stillUsed = weeks.some(week => {
+      const materials = [
+        ...(week.materials || []),
+        ...(week.sessions || []).flatMap(session => session.materials || []),
+      ];
+      return materials.some(material => material.fileId === previousFileId);
+    });
+    if (stillUsed) return;
+    this.fileService.remove(previousFileId).subscribe({
+      error: () => console.warn('No se pudo eliminar el archivo anterior:', previousFileId),
     });
   }
 

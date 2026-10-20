@@ -1,13 +1,15 @@
-import { Component, Inject, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { renderAsync } from 'docx-preview';
 import * as XLSX from 'xlsx';
 import { FileService } from '@core/services/file.service';
+import { NotificationService } from '@core/services/notification.service';
 
 export interface FilePreviewData {
   fileId: string;
   title: string;
+  /** Tipo lógico del material (pdf, doc, foto, ...) para inferir cuando el MIME viene genérico. */
+  fileType?: string;
 }
 
 @Component({
@@ -22,11 +24,14 @@ export interface FilePreviewData {
         <button mat-icon-button (click)="zoomIn()" aria-label="Acercar" [disabled]="zoom >= 2.5"><mat-icon>add</mat-icon></button>
         <button mat-button (click)="zoom = 1">100%</button>
       </span>
+      <button mat-icon-button class="dialog-close" mat-dialog-close aria-label="Cerrar" title="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
     </h2>
     <mat-dialog-content class="preview-content">
       <div class="preview-box" [class.zoomable]="kind === 'pdf' || kind === 'image' || kind === 'video'">
         <div class="zoom-stage" [style.transform]="kind === 'pdf' || kind === 'image' || kind === 'video' ? 'scale(' + zoom + ')' : null">
-          <iframe *ngIf="kind === 'pdf'" [src]="trustedUrl" class="preview-frame"></iframe>
+          <iframe *ngIf="kind === 'pdf'" #pdfFrame class="preview-frame"></iframe>
           <img *ngIf="kind === 'image'" [src]="blobUrl" class="preview-img" alt="Vista previa" />
           <video *ngIf="kind === 'video'" [src]="blobUrl" class="preview-video" controls></video>
         </div>
@@ -37,7 +42,18 @@ export interface FilePreviewData {
           <mat-icon>slideshow</mat-icon>
           <p>PowerPoint no se puede renderizar en el navegador. Descargá el archivo para verlo.</p>
         </div>
-        <div *ngIf="!blobUrl && kind !== 'word' && kind !== 'excel' && kind !== 'ppt'" class="preview-loading">Cargando archivo...</div>
+        <div *ngIf="error" class="preview-error">
+          <mat-icon>error_outline</mat-icon>
+          <p>{{ error }}</p>
+          <button mat-stroked-button color="primary" type="button" (click)="retry()">
+            <mat-icon>refresh</mat-icon> Reintentar
+          </button>
+          <p class="preview-error-hint">
+            Si el problema continúa, el archivo puede haber sido eliminado del servidor.
+            Vuelve a adjuntarlo editando el material.
+          </p>
+        </div>
+        <div *ngIf="loading && !error" class="preview-loading">Cargando archivo...</div>
       </div>
       <p *ngIf="kind === 'ppt'" class="office-note">Usá el botón descargar para abrirlo en PowerPoint.</p>
     </mat-dialog-content>
@@ -54,6 +70,7 @@ export interface FilePreviewData {
     .dialog-title-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .zoom-controls { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 0.25rem; margin-left: auto; }
     .zoom-value { font-size: 0.8125rem; color: var(--color-text-light); min-width: 42px; text-align: center; }
+    .dialog-close { flex: 0 0 auto; margin-left: 0.25rem; }
     .preview-content { flex: 1 1 auto; width: 100%; min-width: 0; min-height: 0; max-width: none; max-height: none; padding: 0 1rem; }
     .preview-box { display: grid; place-items: center; width: 100%; height: 100%; min-height: 0; background: #f8fafc; border: 1px solid #e3e8ef; border-radius: 8px; overflow: auto; }
     .preview-box.zoomable { overflow: auto; }
@@ -63,6 +80,10 @@ export interface FilePreviewData {
     .preview-video { width: 100%; height: 100%; object-fit: contain; }
     .preview-text { width: 100%; height: 100%; overflow: auto; padding: 1rem; font-size: 0.875rem; white-space: pre-wrap; }
     .preview-loading { color: var(--color-text-light); }
+    .preview-error { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 2rem 1.5rem; text-align: center; }
+    .preview-error mat-icon { font-size: 44px; width: 44px; height: 44px; color: var(--color-danger); }
+    .preview-error p { margin: 0; color: var(--color-gray-dark); }
+    .preview-error .preview-error-hint { max-width: 460px; color: var(--color-text-light); font-size: 0.8125rem; }
     .office-note { color: var(--color-text-light); font-size: 0.8125rem; margin-top: 0.75rem; }
     .word-container { width: 100%; height: 100%; overflow: auto; background: #fff; padding: 1rem; }
     .excel-container { width: 100%; height: 100%; overflow: auto; background: #fff; }
@@ -81,19 +102,21 @@ export interface FilePreviewData {
     }
   `]
 })
-export class FilePreviewDialogComponent implements OnInit {
+export class FilePreviewDialogComponent implements OnInit, OnDestroy {
   @ViewChild('wordContainer', { static: false }) wordContainer!: ElementRef;
   @ViewChild('excelContainer', { static: false }) excelContainer!: ElementRef;
+  @ViewChild('pdfFrame', { static: false }) pdfFrame?: ElementRef<HTMLIFrameElement>;
 
   blobUrl: string | null = null;
-  trustedUrl: SafeResourceUrl | null = null;
   kind: 'pdf' | 'image' | 'video' | 'text' | 'word' | 'excel' | 'ppt' = 'pdf';
   textContent = '';
   zoom = 1;
+  loading = true;
+  error: string | null = null;
 
   constructor(
     public fileService: FileService,
-    private sanitizer: DomSanitizer,
+    private notificationService: NotificationService,
     @Inject(MAT_DIALOG_DATA) public data: FilePreviewData,
   ) {}
 
@@ -101,8 +124,26 @@ export class FilePreviewDialogComponent implements OnInit {
   zoomOut() { this.zoom = Math.max(0.5, +(this.zoom - 0.25).toFixed(2)); }
 
   ngOnInit() {
+    this.loadFile();
+  }
+
+  ngOnDestroy() {
+    this.revokeBlobUrl();
+  }
+
+  retry(): void {
+    this.revokeBlobUrl();
+    this.error = null;
+    this.kind = 'pdf';
+    this.textContent = '';
+    this.loadFile();
+  }
+
+  private loadFile(): void {
+    this.loading = true;
     this.fileService.getBlob(this.data.fileId).subscribe({
       next: (blob) => {
+        this.loading = false;
         this.detectKind(blob);
         if (this.kind === 'text') {
           blob.text().then(t => { this.textContent = t; });
@@ -117,22 +158,56 @@ export class FilePreviewDialogComponent implements OnInit {
           return;
         }
         this.blobUrl = URL.createObjectURL(blob);
-        this.trustedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.blobUrl);
+        if (this.kind === 'pdf') {
+          this.attachPdf();
+        }
       },
-      error: (err) => console.error('Error previewing file:', err),
+      error: (err) => {
+        this.loading = false;
+        this.error = 'No se pudo cargar el archivo. Puede que ya no esté disponible en el servidor.';
+        console.error('Error previewing file:', err);
+      },
     });
   }
 
+  /** Asigna el blob URL directamente al iframe (evita el contexto RESOURCE_URL del template). */
+  private attachPdf(): void {
+    setTimeout(() => {
+      if (this.pdfFrame && this.blobUrl) {
+        this.pdfFrame.nativeElement.src = this.blobUrl;
+      }
+    });
+  }
+
+  private revokeBlobUrl(): void {
+    if (this.blobUrl) {
+      URL.revokeObjectURL(this.blobUrl);
+      this.blobUrl = null;
+    }
+  }
+
   private detectKind(blob: Blob) {
-    const type = blob.type || '';
+    const type = (blob.type || '').toLowerCase();
     if (type.includes('pdf')) this.kind = 'pdf';
     else if (type.includes('image')) this.kind = 'image';
     else if (type.includes('video')) this.kind = 'video';
     else if (type.includes('wordprocessingml') || type.includes('msword')) this.kind = 'word';
     else if (type.includes('spreadsheetml') || type.includes('excel')) this.kind = 'excel';
-    else if (type.includes('presentationml')) this.kind = 'ppt';
+    else if (type.includes('presentationml') || type.includes('powerpoint')) this.kind = 'ppt';
     else if (type.includes('text') || type.includes('json') || type.includes('csv')) this.kind = 'text';
-    else this.kind = 'ppt';
+    else this.kind = this.kindFromFileType();
+  }
+
+  /** Fallback cuando el servidor devuelve un MIME genérico (application/octet-stream). */
+  private kindFromFileType(): 'pdf' | 'image' | 'video' | 'text' | 'word' | 'excel' | 'ppt' {
+    switch (this.data.fileType) {
+      case 'pdf': return 'pdf';
+      case 'foto': return 'image';
+      case 'video': return 'video';
+      case 'texto': return 'text';
+      case 'doc': return 'word';
+      default: return 'ppt';
+    }
   }
 
   private renderWord(buffer: ArrayBuffer) {
@@ -163,6 +238,8 @@ export class FilePreviewDialogComponent implements OnInit {
   }
 
   download() {
-    this.fileService.download(this.data.fileId, this.data.title);
+    this.fileService.download(this.data.fileId, this.data.title, () => {
+      this.notificationService.error('No se pudo descargar el archivo. Puede que ya no esté disponible.');
+    });
   }
 }

@@ -22,6 +22,7 @@ export class MaterialCreateDialogComponent {
   description = '';
   url = '';
   file: File | null = null;
+  private closing = false;
 
   constructor(
     private dialogRef: MatDialogRef<MaterialCreateDialogComponent>,
@@ -38,7 +39,8 @@ export class MaterialCreateDialogComponent {
   }
 
   save(): void {
-    if (!this.title) return;
+    if (this.closing || !this.title.trim()) return;
+    this.closing = true;
 
     const result: MaterialCreateResult = {
       type: this.type,

@@ -48,7 +48,7 @@ export class FileService {
   }
 
   /** Descarga con autenticación (evita 401 porque usa el interceptor) */
-  download(fileId: string, fallbackName = 'archivo'): void {
+  download(fileId: string, fallbackName = 'archivo', onError?: (err: unknown) => void): void {
     this.getBlob(fileId).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -62,12 +62,17 @@ export class FileService {
       },
       error: (err) => {
         console.error('Error descargando archivo:', err);
+        onError?.(err);
       },
     });
   }
 
   getBlob(fileId: string) {
     return this.http.get(`${this.apiUrl}/${fileId}`, { responseType: 'blob' });
+  }
+
+  remove(fileId: string): Observable<UploadedFile> {
+    return this.http.delete<UploadedFile>(`${this.apiUrl}/${fileId}`);
   }
 
   findByContext(contextType: string, referenceId: string): Observable<UploadedFile[]> {

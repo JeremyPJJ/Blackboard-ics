@@ -14,7 +14,15 @@
 
 **Separación de acciones en la vista de semanas:** Se corrigió el espaciado entre los botones de agregar, editar y eliminar y los íconos de expandir/contraer de las semanas y sus secciones, que quedaban demasiado juntos en pantallas móviles.
 
+**Vista previa de archivos:** Se corrigió el diálogo de vista previa, que quedaba bloqueado en "Cargando archivo..." cuando el archivo ya no existía en el servidor. Ahora muestra un mensaje claro con opciones para reintentar o descargar, y se eliminó el error NG0904 al renderizar PDFs asignando el origen del visor de forma segura. También se detecta el tipo de archivo por su extensión lógica cuando el servidor devuelve un tipo MIME genérico, y se agregó un botón de cierre visible en la cabecera del modal para facilitar su uso en móviles.
+
+**Archivos duplicados al subir o reemplazar:** Se agregó protección frente a peticiones de subida idénticas concurrentes o repetidas en un intervalo de 10 segundos. El backend compara el contenido del archivo, el usuario y el contexto de la subida para reutilizar el registro y evitar copias duplicadas. También se bloqueó el guardado repetido en los diálogos de creación y edición de materiales.
+
+**Limpieza del archivo reemplazado:** Al reemplazar un archivo de un material o de una sesión, el anterior se elimina únicamente después de guardar correctamente los cambios del curso. Se conserva si otro material del mismo curso todavía lo utiliza.
+
 ## Mejoras
+
+**Nombres únicos para los archivos almacenados:** Se incorporó un identificador único a los nombres de almacenamiento para evitar colisiones entre archivos subidos en el mismo instante, conservando el nombre original en los metadatos.
 
 **Rediseño del panel de notificaciones:** Se renovó por completo la interfaz del panel con un encabezado que incluye icono, subtítulo dinámico ("Tienes N notificaciones sin leer" o "Estás al día") y botón para marcar todas como leídas. Las notificaciones ahora se agrupan por día ("Hoy", "Ayer" y fecha), se muestran como tarjetas con estilo diferenciado para leídas y no leídas, iconos según el tipo, indicador de no leída y hora. Se agregó el pie "Ver todas las notificaciones" que cierra el panel y navega a Mensajería, y se corrigieron los desbordes y el desplazamiento en pantallas pequeñas.
 

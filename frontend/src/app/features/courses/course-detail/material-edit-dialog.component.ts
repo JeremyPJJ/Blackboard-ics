@@ -76,6 +76,7 @@ export class MaterialEditDialogComponent {
   type: string;
   url: string;
   file: File | null = null;
+  private closing = false;
 
   constructor(
     private dialogRef: MatDialogRef<MaterialEditDialogComponent>,
@@ -93,7 +94,8 @@ export class MaterialEditDialogComponent {
   }
 
   save(): void {
-    if (!this.title) return;
+    if (this.closing || !this.title) return;
+    this.closing = true;
     const result: MaterialEditResult = {
       title: this.title.trim(),
       description: this.description,
