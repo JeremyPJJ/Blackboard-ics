@@ -147,6 +147,18 @@ mat-dialog-content {
   }
 
   ::ng-deep {
+    .mat-mdc-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 0 8px;
+    }
+
+    .mdc-tab__text-label {
+      white-space: normal;
+      text-align: center;
+      line-height: 1.3;
+    }
+
     .mat-mdc-tab-header {
       border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     }
@@ -549,6 +561,11 @@ mat-dialog-actions {
 
   .profile-tabs .tab-icon {
     display: none;
+  }
+
+  .profile-tabs ::ng-deep .mat-mdc-tab {
+    font-size: 13px;
+    letter-spacing: normal;
   }
 
   .info-list {

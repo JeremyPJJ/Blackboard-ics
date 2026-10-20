@@ -1,23 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
-import { NotificationsStore } from '@core/services/notifications.store';
 import { CourseService } from '@core/services/course.service';
 import { Course } from '@core/models';
 import { ProfileService } from '../services/profile.service';
 import { ProfileStore } from '../store/profile.store';
 
-/** Pestañas del perfil: datos, seguridad (contraseña) y notificaciones. */
-type ProfileTab = 'info' | 'password' | 'notifications';
+/** Pestañas del perfil: datos y seguridad (contraseña). */
+type ProfileTab = 'info' | 'password';
 
 /**
  * Diálogo de perfil accesible desde la barra de navegación ("Mi perfil").
  * Muestra los datos reales del usuario (nombre, correo, rol) y organiza el
- * contenido en tres pestañas: Información personal, Seguridad (cambio de
- * contraseña self-service) y Notificaciones (acceso al panel existente).
+ * contenido en dos pestañas: Información personal y Seguridad (cambio de
+ * contraseña self-service).
  *
  * Flujo post-éxito: el backend revoca TODOS los refresh tokens del usuario
  * (decisión del diseño → fuerza re-login en todos los dispositivos), así que la
@@ -58,8 +57,6 @@ export class ProfileDialogComponent implements OnInit {
     private router: Router,
     public store: ProfileStore,
     public dialogRef: MatDialogRef<ProfileDialogComponent>,
-    public notificationsStore: NotificationsStore,
-    private dialog: MatDialog,
   ) {
     this.passwordForm = this.fb.group(
       {
@@ -76,7 +73,6 @@ export class ProfileDialogComponent implements OnInit {
     this.activeTab = 'info';
     this.loadProfile();
     this.loadCourses();
-    this.notificationsStore.load();
   }
 
   /** super_admin no lleva cursos (Spec N1): no ve la sección, ve empty-state. */
@@ -116,21 +112,6 @@ export class ProfileDialogComponent implements OnInit {
     this.router.navigate(['/courses', courseId]);
   }
 
-  /**
-   * Abre el panel de notificaciones como dialog desde la pestaña
-   * "Notificaciones" del perfil. Carga lazy, chunk < 500KB.
-   */
-  async openNotifications(): Promise<void> {
-    const { NotificationsPanelComponent } = await import(
-      '@features/notifications/notifications-panel.component'
-    );
-    this.dialog.open(NotificationsPanelComponent, {
-      width: '520px',
-      maxWidth: '96vw',
-      autoFocus: false,
-    });
-  }
-
   get user() {
     return this.store.user();
   }
@@ -166,20 +147,18 @@ export class ProfileDialogComponent implements OnInit {
     return { score, label: this.strengthLabels[score] };
   }
 
-  /** Índice de la pestaña activa para mat-tab-group (0: info, 1: seguridad, 2: notificaciones). */
+  /** Índice de la pestaña activa para mat-tab-group (0: info, 1: seguridad). */
   get tabIndex(): number {
     switch (this.activeTab) {
       case 'password':
         return 1;
-      case 'notifications':
-        return 2;
       default:
         return 0;
     }
   }
 
   onTabChange(index: number): void {
-    this.activeTab = index === 1 ? 'password' : index === 2 ? 'notifications' : 'info';
+    this.activeTab = index === 1 ? 'password' : 'info';
   }
 
   togglePasswordVisibility(field: 'current' | 'new' | 'confirm'): void {

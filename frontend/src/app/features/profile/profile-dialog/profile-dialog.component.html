@@ -31,7 +31,8 @@
     class="profile-tabs"
     [selectedIndex]="tabIndex"
     (selectedIndexChange)="onTabChange($event)"
-    [mat-stretch-tabs]="false"
+    [mat-stretch-tabs]="true"
+    [disablePagination]="true"
     animationDuration="200ms"
   >
     <!-- Información personal -->
@@ -181,33 +182,6 @@
       </div>
     </mat-tab>
 
-    <!-- Notificaciones -->
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="tab-icon">notifications_none</mat-icon>
-        <span>Notificaciones</span>
-      </ng-template>
-
-      <div class="tab-panel">
-        <p class="tab-intro">Consulta los avisos y mensajes que has recibido en la plataforma.</p>
-
-        <button type="button" class="notifications-option" (click)="openNotifications()">
-          <span class="option-icon">
-            <mat-icon>notifications_none</mat-icon>
-          </span>
-          <span class="option-text">
-            <span class="option-title">Mis notificaciones</span>
-            <span class="option-subtitle">
-              {{ notificationsStore.unreadCount() > 0 ? notificationsStore.unreadCount() + ' sin leer' : 'Estás al día' }}
-            </span>
-          </span>
-          <span class="option-badge" *ngIf="notificationsStore.unreadCount() > 0">
-            {{ notificationsStore.unreadCount() > 99 ? '99+' : notificationsStore.unreadCount() }}
-          </span>
-          <mat-icon class="option-arrow">chevron_right</mat-icon>
-        </button>
-      </div>
-    </mat-tab>
   </mat-tab-group>
 </mat-dialog-content>
 

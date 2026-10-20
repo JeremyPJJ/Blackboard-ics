@@ -2,6 +2,8 @@
 
 ## Correcciones
 
+**Pestañas del perfil en móvil:** Se retiró la pestaña "Notificaciones" de "Mi perfil", dejando únicamente "Información personal" y "Seguridad". Se ajustó su distribución para mostrar ambas completas sin flechas de desplazamiento, permitiendo que "Información personal" ocupe dos líneas en pantallas pequeñas y evitando el recorte de "Seguridad".
+
 **Conversaciones en tiempo real:** Se corrigió un problema por el cual las conversaciones creadas después de establecer la conexión del socket no incorporaban automáticamente al usuario a su sala correspondiente en tiempo real.
 
 **Footer del login:** Se corrigió el footer de la página de inicio de sesión para mejorar su visualización y presentación.
